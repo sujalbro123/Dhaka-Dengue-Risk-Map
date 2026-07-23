@@ -1,0 +1,63 @@
+export type RiskLevel = 'low' | 'moderate' | 'high';
+
+export interface MonthlyRecord {
+  month: string;
+  cases: number;
+  rainfallMm: number;
+}
+
+export interface DhakaArea {
+  id: string;
+  name: string;
+  bnName: string;
+  corporation: 'DNCC' | 'DSCC'; // Dhaka North or Dhaka South
+  zoneNumber: string;
+  wards: string;
+  population: number;
+  areaSqKm: number;
+  populationDensity: number; // persons / sq km
+  recentCases30d: number; // Historical cases in last 30 days
+  recentRainfallMm: number; // Rainfall in last 14-30 days
+  breteauIndex: number; // Aedes larvae index (Breteau Index / 100 houses)
+  monthlyHistory: MonthlyRecord[]; // Last 6 months
+  preventionTips: string[];
+  keyRiskFactors: string[];
+  primaryHospitals: string[];
+  coordinates: { x: number; y: number }; // Center coordinate on custom SVG map
+  svgPath: string; // Vector polygon path for map
+}
+
+export interface NormalizedFactors {
+  normCases: number;
+  normRainfall: number;
+  normDensity: number;
+}
+
+export interface ComputedAreaRisk extends DhakaArea {
+  normalized: NormalizedFactors;
+  rawRiskScore: number; // 0.0 to 1.0
+  riskScore100: number; // 0 to 100
+  riskLevel: RiskLevel;
+  weightedCasesContribution: number; // 0.5 * normCases
+  weightedRainfallContribution: number; // 0.3 * normRainfall
+  weightedDensityContribution: number; // 0.2 * normDensity
+}
+
+export interface ModelWeights {
+  casesWeight: number; // default 0.5
+  rainfallWeight: number; // default 0.3
+  densityWeight: number; // default 0.2
+}
+
+export interface SimulationModifiers {
+  rainfallMultiplier: number; // e.g. 1.0 = normal, 1.5 = +50% monsoon rain
+  caseMultiplier: number; // e.g. 1.0 = normal, 1.2 = surge
+  densityModifier: number; // e.g. 1.0
+}
+
+export interface PresetScenario {
+  id: string;
+  name: string;
+  description: string;
+  modifiers: SimulationModifiers;
+}
