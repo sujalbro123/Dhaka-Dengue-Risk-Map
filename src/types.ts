@@ -1,4 +1,4 @@
-export type RiskLevel = 'low' | 'moderate' | 'high';
+export type RiskLevel = 'low' | 'moderate' | 'high' | 'critical';
 
 export interface MonthlyRecord {
   month: string;

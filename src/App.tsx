@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { DhakaArea, ModelWeights, SimulationModifiers, ComputedAreaRisk } from './types';
 import { INITIAL_DHAKA_AREAS, PRESET_SCENARIOS } from './data/dhakaData';
 import { calculateAreaRisks, DEFAULT_WEIGHTS, DEFAULT_MODIFIERS } from './utils/riskCalculator';
@@ -11,6 +11,7 @@ import { AreaDetailPanel } from './components/AreaDetailPanel';
 import { SimulationControls } from './components/SimulationControls';
 import { HowItWorksModal } from './components/HowItWorksModal';
 import { CsvDataModal } from './components/CsvDataModal';
+import { CriticalRiskToast } from './components/CriticalRiskToast';
 
 export default function App() {
   const [areasData, setAreasData] = useState<DhakaArea[]>(INITIAL_DHAKA_AREAS);
@@ -25,10 +26,25 @@ export default function App() {
   const [isHowItWorksOpen, setIsHowItWorksOpen] = useState<boolean>(false);
   const [isCsvModalOpen, setIsCsvModalOpen] = useState<boolean>(false);
 
+  // Critical notification toast dismissal state
+  const [isCriticalToastDismissed, setIsCriticalToastDismissed] = useState<boolean>(false);
+
   // Compute live risk scores for all areas whenever dataset, weights, or modifiers change
   const computedAreas = useMemo(() => {
     return calculateAreaRisks(areasData, weights, modifiers);
   }, [areasData, weights, modifiers]);
+
+  // Identify areas that hit or exceed critical risk threshold (score >= 80 or raw >= 0.80)
+  const criticalAreas = useMemo(() => {
+    return computedAreas.filter((a) => a.rawRiskScore >= 0.80 || a.riskScore100 >= 80 || a.riskLevel === 'critical');
+  }, [computedAreas]);
+
+  // Reset toast dismissal whenever simulation parameters or scenarios change
+  useEffect(() => {
+    if (criticalAreas.length > 0) {
+      setIsCriticalToastDismissed(false);
+    }
+  }, [weights, modifiers, selectedScenarioId, areasData]);
 
   // Selected area object
   const selectedArea = useMemo(() => {
@@ -43,6 +59,7 @@ export default function App() {
     if (scenario) {
       setModifiers(scenario.modifiers);
     }
+    setIsCriticalToastDismissed(false);
   };
 
   // Reset Simulation Modifiers & Weights
@@ -50,6 +67,7 @@ export default function App() {
     setWeights(DEFAULT_WEIGHTS);
     setModifiers(DEFAULT_MODIFIERS);
     setSelectedScenarioId('current-jul');
+    setIsCriticalToastDismissed(false);
   };
 
   // Import custom CSV data
@@ -70,13 +88,14 @@ export default function App() {
     });
 
     setAreasData(updatedAreas);
+    setIsCriticalToastDismissed(false);
     if (updatedAreas.length > 0) {
       setSelectedAreaId(updatedAreas[0].id);
     }
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans selection:bg-emerald-500 selection:text-slate-950">
+    <div className="min-h-screen bg-[#0a0c10] text-slate-100 flex flex-col font-sans selection:bg-emerald-500 selection:text-slate-950">
       {/* App Header */}
       <Header
         selectedScenarioId={selectedScenarioId}
@@ -95,9 +114,15 @@ export default function App() {
         {/* Interactive Model Simulation Sliders (Collapsible) */}
         <SimulationControls
           weights={weights}
-          onChangeWeights={setWeights}
+          onChangeWeights={(w) => {
+            setWeights(w);
+            setIsCriticalToastDismissed(false);
+          }}
           modifiers={modifiers}
-          onChangeModifiers={setModifiers}
+          onChangeModifiers={(m) => {
+            setModifiers(m);
+            setIsCriticalToastDismissed(false);
+          }}
           onReset={handleResetSimulation}
           isOpen={isSimControlsOpen}
           onClose={() => setIsSimControlsOpen(false)}
@@ -116,12 +141,12 @@ export default function App() {
                 onChangeViewMode={setViewMode}
               />
             ) : (
-              <div className="bg-slate-900 border border-slate-800 rounded-2xl p-4 shadow-xl flex-1 flex flex-col">
+              <div className="bg-[#0f1218] border border-slate-800 rounded-2xl p-4 shadow-xl flex-1 flex flex-col">
                 <div className="flex items-center justify-between pb-3 border-b border-slate-800">
                   <h2 className="text-base font-bold text-white">
                     Dhaka Thana Outbreak Directory
                   </h2>
-                  <div className="flex items-center bg-slate-800 p-1 rounded-xl border border-slate-700">
+                  <div className="flex items-center bg-[#1a1f26] p-1 rounded-xl border border-slate-700">
                     <button
                       onClick={() => setViewMode('map')}
                       className="px-3 py-1 text-xs font-medium text-slate-300 hover:text-white"
@@ -164,8 +189,16 @@ export default function App() {
         </div>
       </main>
 
+      {/* Critical Threat Visual Notification Toast */}
+      <CriticalRiskToast
+        criticalAreas={criticalAreas}
+        isVisible={!isCriticalToastDismissed && criticalAreas.length > 0}
+        onDismiss={() => setIsCriticalToastDismissed(true)}
+        onSelectArea={(areaId) => setSelectedAreaId(areaId)}
+      />
+
       {/* Footer / Academic Citation */}
-      <footer className="border-t border-slate-800/80 bg-slate-900/60 py-4 mt-8 text-center text-xs text-slate-500">
+      <footer className="border-t border-slate-800/80 bg-[#0f1218]/80 py-4 mt-8 text-center text-xs text-slate-500">
         <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-2">
           <div>
             Dhaka Dengue Early Warning Intelligence Model v1.2 • University Poster Competition Prototype

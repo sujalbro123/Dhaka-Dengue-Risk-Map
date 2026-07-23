@@ -68,9 +68,11 @@ export function calculateAreaRisks(
     const riskScore100 = Math.round(rawRiskScore * 100);
 
     let riskLevel: RiskLevel = 'low';
-    if (rawRiskScore >= 0.65) {
+    if (rawRiskScore >= 0.80) {
+      riskLevel = 'critical';
+    } else if (rawRiskScore >= 0.60) {
       riskLevel = 'high';
-    } else if (rawRiskScore >= 0.40) {
+    } else if (rawRiskScore >= 0.35) {
       riskLevel = 'moderate';
     } else {
       riskLevel = 'low';
@@ -98,32 +100,41 @@ export function calculateAreaRisks(
 
 export function getRiskBadgeColor(level: RiskLevel) {
   switch (level) {
+    case 'critical':
+      return {
+        bg: 'bg-red-950/70',
+        text: 'text-red-400 font-extrabold',
+        border: 'border-red-500/80',
+        fill: '#dc2626',
+        glow: 'shadow-[0_0_20px_rgba(220,38,38,0.7)]',
+        label: 'Critical Threat (>0.80)',
+      };
     case 'high':
       return {
-        bg: 'bg-red-500/10 dark:bg-red-950/40',
-        text: 'text-red-600 dark:text-red-400',
-        border: 'border-red-500/30',
-        fill: '#ef4444',
-        glow: 'shadow-[0_0_15px_rgba(239,68,68,0.4)]',
-        label: 'High Risk (Epidemic Threat)',
+        bg: 'bg-rose-500/15',
+        text: 'text-rose-400',
+        border: 'border-rose-500/40',
+        fill: '#f43f5e',
+        glow: 'shadow-[0_0_15px_rgba(244,63,94,0.4)]',
+        label: 'High Risk (60-79)',
       };
     case 'moderate':
       return {
-        bg: 'bg-amber-500/10 dark:bg-amber-950/40',
-        text: 'text-amber-600 dark:text-amber-400',
-        border: 'border-amber-500/30',
+        bg: 'bg-amber-500/15',
+        text: 'text-amber-400',
+        border: 'border-amber-500/40',
         fill: '#f59e0b',
         glow: 'shadow-[0_0_15px_rgba(245,158,11,0.3)]',
-        label: 'Moderate Risk (Watch Zone)',
+        label: 'Moderate Risk (35-59)',
       };
     case 'low':
       return {
-        bg: 'bg-emerald-500/10 dark:bg-emerald-950/40',
-        text: 'text-emerald-600 dark:text-emerald-400',
-        border: 'border-emerald-500/30',
+        bg: 'bg-emerald-500/15',
+        text: 'text-emerald-400',
+        border: 'border-emerald-500/40',
         fill: '#10b981',
         glow: 'shadow-[0_0_15px_rgba(16,185,129,0.2)]',
-        label: 'Low Risk (Baseline)',
+        label: 'Low Risk (<35)',
       };
   }
 }
