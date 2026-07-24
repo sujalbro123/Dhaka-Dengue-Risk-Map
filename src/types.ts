@@ -20,6 +20,10 @@ export interface DhakaArea {
   populationDensity: number; // persons / sq km
   recentCases30d: number; // Historical cases in last 30 days
   recentRainfallMm: number; // Rainfall in last 14-30 days
+  lastWeekCases30d?: number; // Previous week case count for trend
+  lastWeekRainfallMm?: number; // Previous week rainfall for trend
+  priorYearCases30d?: number; // Prior year same period cases
+  priorYearRainfallMm?: number; // Prior year same period rainfall
   breteauIndex: number; // Aedes larvae index (Breteau Index / 100 houses)
   monthlyHistory: MonthlyRecord[]; // Last 6 months
   preventionTips: string[];
@@ -43,6 +47,13 @@ export interface ComputedAreaRisk extends DhakaArea {
   rawRiskScore: number; // 0.0 to 1.0
   riskScore100: number; // 0 to 100
   riskLevel: RiskLevel;
+  trend: 'rising' | 'falling' | 'stable';
+  trendDelta: number; // difference vs last week (e.g. +6 or -3)
+  lastWeekRiskScore: number;
+  priorYearCases30d: number;
+  priorYearRiskScore: number;
+  yearOverYearChangePercent: number; // e.g. +28% or -15%
+  yearOverYearText: string; // e.g. "Risk is 28% higher than same period last year"
   weightedCasesContribution: number; // 0.5 * normCases
   weightedRainfallContribution: number; // 0.3 * normRainfall
   weightedDensityContribution: number; // 0.2 * normDensity
@@ -84,6 +95,7 @@ export interface SimulationModifiers {
   rainfallMultiplier: number; // e.g. 1.0 = normal, 1.5 = +50% monsoon rain
   caseMultiplier: number; // e.g. 1.0 = normal, 1.2 = surge
   densityModifier: number; // e.g. 1.0
+  whatIfRainfallMm?: number | null; // What-if override value (e.g. 0 - 300 mm)
 }
 
 export interface PresetScenario {

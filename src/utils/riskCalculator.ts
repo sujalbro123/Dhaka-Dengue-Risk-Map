@@ -19,15 +19,36 @@ export function calculateAreaRisks(
 ): ComputedAreaRisk[] {
   if (areas.length === 0) return [];
 
-  // Calculate adjusted raw values based on simulation modifiers
+  // Calculate adjusted current raw values based on simulation modifiers or what-if rainfall
   const adjustedData = areas.map((area) => {
     const cases = Math.round(area.recentCases30d * modifiers.caseMultiplier);
-    const rainfall = Math.round(area.recentRainfallMm * modifiers.rainfallMultiplier);
+    const rainfall =
+      modifiers.whatIfRainfallMm != null
+        ? Math.round(modifiers.whatIfRainfallMm)
+        : Math.round(area.recentRainfallMm * modifiers.rainfallMultiplier);
     const density = Math.round(area.populationDensity * modifiers.densityModifier);
-    return { id: area.id, cases, rainfall, density };
+
+    // Prior week estimated values (if not provided, default to realistic historical ratio)
+    const lastWeekCases = area.lastWeekCases30d ?? Math.round(cases * 0.90);
+    const lastWeekRain = area.lastWeekRainfallMm ?? Math.round(rainfall * 0.92);
+
+    // Prior year estimated values (if not provided, default to realistic prior year ratio)
+    const priorYearCases = area.priorYearCases30d ?? Math.round(cases * 0.76);
+    const priorYearRain = area.priorYearRainfallMm ?? Math.round(rainfall * 0.90);
+
+    return {
+      id: area.id,
+      cases,
+      rainfall,
+      density,
+      lastWeekCases,
+      lastWeekRain,
+      priorYearCases,
+      priorYearRain,
+    };
   });
 
-  // Find min and max for normalization (0 to 1)
+  // Find min and max for normalization (0 to 1) across current datasets
   let minCases = Infinity, maxCases = -Infinity;
   let minRain = Infinity, maxRain = -Infinity;
   let minDensity = Infinity, maxDensity = -Infinity;
@@ -48,6 +69,8 @@ export function calculateAreaRisks(
   const rainRange = maxRain - minRain || 1;
   const densityRange = maxDensity - minDensity || 1;
 
+  const totalWeight = weights.casesWeight + weights.rainfallWeight + weights.densityWeight || 1.0;
+
   // Compute normalized scores and weighted sum
   return areas.map((area, index) => {
     const adj = adjustedData[index];
@@ -62,10 +85,45 @@ export function calculateAreaRisks(
     const weightedRainfall = normRainfall * weights.rainfallWeight;
     const weightedDensity = normDensity * weights.densityWeight;
 
-    // Total risk score (0.0 to 1.0)
-    const totalWeight = weights.casesWeight + weights.rainfallWeight + weights.densityWeight || 1.0;
+    // Total current risk score (0.0 to 1.0)
     const rawRiskScore = (weightedCases + weightedRainfall + weightedDensity) / totalWeight;
     const riskScore100 = Math.round(rawRiskScore * 100);
+
+    // Last Week Risk Score Calculation
+    const lwNormCases = Math.max(0, Math.min(1, (adj.lastWeekCases - minCases) / caseRange));
+    const lwNormRainfall = Math.max(0, Math.min(1, (adj.lastWeekRain - minRain) / rainRange));
+    const lwRawScore = (lwNormCases * weights.casesWeight + lwNormRainfall * weights.rainfallWeight + normDensity * weights.densityWeight) / totalWeight;
+    const lastWeekRiskScore = Math.round(lwRawScore * 100);
+
+    // Trend determination
+    const trendDelta = riskScore100 - lastWeekRiskScore;
+    let trend: 'rising' | 'falling' | 'stable' = 'stable';
+    if (trendDelta >= 2) {
+      trend = 'rising';
+    } else if (trendDelta <= -2) {
+      trend = 'falling';
+    } else {
+      trend = 'stable';
+    }
+
+    // Prior Year Risk Score Calculation
+    const pyNormCases = Math.max(0, Math.min(1, (adj.priorYearCases - minCases) / caseRange));
+    const pyNormRainfall = Math.max(0, Math.min(1, (adj.priorYearRain - minRain) / rainRange));
+    const pyRawScore = (pyNormCases * weights.casesWeight + pyNormRainfall * weights.rainfallWeight + normDensity * weights.densityWeight) / totalWeight;
+    const priorYearRiskScore = Math.round(pyRawScore * 100);
+
+    // Year over year comparison percentage
+    const diffScore = riskScore100 - priorYearRiskScore;
+    const yearOverYearChangePercent = priorYearRiskScore > 0
+      ? Math.round((diffScore / priorYearRiskScore) * 100)
+      : Math.round(((adj.cases - adj.priorYearCases) / (adj.priorYearCases || 1)) * 100);
+
+    const yearOverYearText =
+      yearOverYearChangePercent > 0
+        ? `${area.name} risk score is ${yearOverYearChangePercent}% higher than the same period last year`
+        : yearOverYearChangePercent < 0
+        ? `${area.name} risk score is ${Math.abs(yearOverYearChangePercent)}% lower than the same period last year`
+        : `${area.name} risk score is equal to the same period last year`;
 
     let riskLevel: RiskLevel = 'low';
     if (rawRiskScore >= 0.80) {
@@ -102,6 +160,13 @@ export function calculateAreaRisks(
       crowdsourcedReports: area.crowdsourcedReports || 0,
       capacityGap,
       capacityStatus,
+      trend,
+      trendDelta,
+      lastWeekRiskScore,
+      priorYearCases30d: adj.priorYearCases,
+      priorYearRiskScore,
+      yearOverYearChangePercent,
+      yearOverYearText,
       normalized: {
         normCases,
         normRainfall,

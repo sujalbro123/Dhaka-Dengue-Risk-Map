@@ -78,17 +78,89 @@ export const AreaDetailPanel: React.FC<AreaDetailPanelProps> = ({
           </div>
         </div>
 
-        {/* Risk Score Highlight Badge */}
-        <div className={`p-3 rounded-2xl border ${badge.bg} ${badge.border} text-right min-w-[140px]`}>
-          <div className="text-[10px] uppercase tracking-wider font-bold text-slate-400">
-            Risk Score
+        {/* Risk Score Highlight Badge & Trend Arrow */}
+        <div className={`p-3.5 rounded-2xl border ${badge.bg} ${badge.border} text-right min-w-[150px] shadow-lg flex flex-col justify-between`}>
+          <div>
+            <div className="text-[10px] uppercase tracking-wider font-bold text-slate-400">
+              Current Risk Score
+            </div>
+            <div className={`text-2xl sm:text-3xl font-extrabold ${badge.text} flex items-center justify-end gap-1.5`}>
+              <span>{area.riskScore100}</span>
+              <span className="text-xs font-normal text-slate-400">/100</span>
+
+              {/* Trend Arrow */}
+              <span
+                title={`Last week score: ${area.lastWeekRiskScore}`}
+                className={`text-lg font-black ${
+                  area.trend === 'rising'
+                    ? 'text-red-400'
+                    : area.trend === 'falling'
+                    ? 'text-emerald-400'
+                    : 'text-slate-400'
+                }`}
+              >
+                {area.trend === 'rising' ? '↑' : area.trend === 'falling' ? '↓' : '→'}
+              </span>
+            </div>
           </div>
-          <div className={`text-2xl sm:text-3xl font-extrabold ${badge.text}`}>
-            {area.riskScore100}{' '}
-            <span className="text-xs font-normal text-slate-400">/ 100</span>
+
+          <div className="mt-1 pt-1 border-t border-slate-800/80 flex items-center justify-between text-[11px]">
+            <span className="text-slate-400 font-medium">Weekly Trend:</span>
+            <span
+              className={`font-bold ${
+                area.trend === 'rising'
+                  ? 'text-red-400'
+                  : area.trend === 'falling'
+                  ? 'text-emerald-400'
+                  : 'text-slate-400'
+              }`}
+            >
+              {area.trend === 'rising'
+                ? `+${area.trendDelta} pts (Rising)`
+                : area.trend === 'falling'
+                ? `${area.trendDelta} pts (Falling)`
+                : 'Stable'}
+            </span>
           </div>
-          <div className={`text-xs font-bold mt-0.5 ${badge.text}`}>
-            {area.riskLevel.toUpperCase()} RISK
+        </div>
+      </div>
+
+      {/* Year-over-Year Comparison Banner (Requirement E) */}
+      <div className="bg-gradient-to-r from-slate-950 via-slate-900 to-slate-950 border border-amber-500/30 rounded-xl p-3.5 space-y-2">
+        <div className="flex items-center justify-between text-xs">
+          <span className="font-bold text-amber-300 uppercase tracking-wider flex items-center gap-1.5">
+            📅 Year-over-Year Comparison (2026 vs 2025)
+          </span>
+          <span
+            className={`px-2 py-0.5 rounded text-[10px] font-bold ${
+              area.yearOverYearChangePercent > 0
+                ? 'bg-red-500/20 text-red-300 border border-red-500/40'
+                : area.yearOverYearChangePercent < 0
+                ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40'
+                : 'bg-slate-800 text-slate-300'
+            }`}
+          >
+            {area.yearOverYearChangePercent > 0 ? `+${area.yearOverYearChangePercent}% YoY` : `${area.yearOverYearChangePercent}% YoY`}
+          </span>
+        </div>
+
+        {/* Concrete Summary Line */}
+        <p className="text-xs text-slate-200 font-medium leading-relaxed bg-slate-900/90 p-2.5 rounded-lg border border-slate-800">
+          👉 <strong className="text-amber-300">{area.yearOverYearText}</strong>
+        </p>
+
+        {/* Comparison Metric Grid */}
+        <div className="grid grid-cols-2 gap-2 text-center text-xs pt-1">
+          <div className="p-2 bg-slate-900 rounded-lg border border-slate-800">
+            <span className="text-[10px] text-slate-400 block uppercase">2026 (Current Period)</span>
+            <span className="text-sm font-bold text-white">{area.recentCases30d} cases</span>
+            <span className="text-[10px] text-amber-400 block mt-0.5">Risk Score: {area.riskScore100}/100</span>
+          </div>
+
+          <div className="p-2 bg-slate-900 rounded-lg border border-slate-800">
+            <span className="text-[10px] text-slate-400 block uppercase">2025 (Prior Year)</span>
+            <span className="text-sm font-bold text-slate-300">{area.priorYearCases30d} cases</span>
+            <span className="text-[10px] text-slate-400 block mt-0.5">Risk Score: {area.priorYearRiskScore}/100</span>
           </div>
         </div>
       </div>

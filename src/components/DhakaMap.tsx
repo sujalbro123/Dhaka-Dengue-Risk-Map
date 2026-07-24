@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { ComputedAreaRisk } from '../types';
 import { getRiskBadgeColor } from '../utils/riskCalculator';
-import { ZoomIn, ZoomOut, RotateCcw, Map as MapIcon, Grid, TableProperties, Navigation, Hospital, ShieldAlert, Users } from 'lucide-react';
+import { ZoomIn, ZoomOut, RotateCcw, Map as MapIcon, Grid, TableProperties, Navigation, Hospital, ShieldAlert, GitCompare } from 'lucide-react';
 
 interface DhakaMapProps {
   areas: ComputedAreaRisk[];
@@ -10,6 +10,8 @@ interface DhakaMapProps {
   viewMode: 'map' | 'grid' | 'table';
   onChangeViewMode: (mode: 'map' | 'grid' | 'table') => void;
   onOpenSmsAlert?: (areaId: string) => void;
+  isCompareMode?: boolean;
+  onToggleCompareMode?: () => void;
 }
 
 export const DhakaMap: React.FC<DhakaMapProps> = ({
@@ -19,6 +21,8 @@ export const DhakaMap: React.FC<DhakaMapProps> = ({
   viewMode,
   onChangeViewMode,
   onOpenSmsAlert,
+  isCompareMode = false,
+  onToggleCompareMode,
 }) => {
   const [zoom, setZoom] = useState(1);
   const [hoveredArea, setHoveredArea] = useState<ComputedAreaRisk | null>(null);
@@ -126,8 +130,8 @@ export const DhakaMap: React.FC<DhakaMapProps> = ({
               <span>Dhaka City Corporation</span>
             </div>
 
-            {/* Layer Toggle Pill */}
-            <div className="flex items-center bg-slate-900/90 backdrop-blur p-1 rounded-xl border border-slate-800">
+            {/* Layer Toggle & Comparison Mode Pill */}
+            <div className="flex items-center bg-slate-900/90 backdrop-blur p-1 rounded-xl border border-slate-800 gap-1">
               <button
                 onClick={() => setMapOverlay('risk')}
                 className={`px-2.5 py-1 text-[11px] font-bold rounded-lg transition-all flex items-center gap-1 ${
@@ -148,8 +152,24 @@ export const DhakaMap: React.FC<DhakaMapProps> = ({
                 }`}
               >
                 <Hospital className="w-3 h-3" />
-                Hospital Capacity Gap
+                Capacity
               </button>
+
+              {/* Requirement E: Comparison Mode Toggle */}
+              {onToggleCompareMode && (
+                <button
+                  onClick={onToggleCompareMode}
+                  className={`px-2.5 py-1 text-[11px] font-bold rounded-lg transition-all flex items-center gap-1 border ${
+                    isCompareMode
+                      ? 'bg-amber-500 text-slate-950 border-amber-400 shadow-md font-extrabold animate-pulse'
+                      : 'bg-slate-800 text-slate-300 border-slate-700 hover:text-white'
+                  }`}
+                  title="Toggle Year-over-Year Comparison Mode (2026 vs 2025)"
+                >
+                  <GitCompare className="w-3 h-3 text-amber-300" />
+                  <span>{isCompareMode ? 'Comparing 2026 vs 2025' : 'Compare Last Year'}</span>
+                </button>
+              )}
             </div>
           </div>
 
@@ -355,12 +375,12 @@ export const DhakaMap: React.FC<DhakaMapProps> = ({
                         {area.name}
                       </text>
 
-                      {/* Score or Bed Pill */}
+                      {/* Score or Bed Pill with Trend Arrow */}
                       <rect
-                        x="-16"
+                        x={isCompareMode ? "-28" : "-22"}
                         y="-22"
-                        width="32"
-                        height="14"
+                        width={isCompareMode ? "56" : "44"}
+                        height="15"
                         rx="7"
                         fill="#0f172a"
                         stroke={
@@ -370,21 +390,25 @@ export const DhakaMap: React.FC<DhakaMapProps> = ({
                               : '#38bdf8'
                             : badgeColor.fill
                         }
-                        strokeWidth="1"
+                        strokeWidth="1.2"
                       />
                       <text
                         x="0"
-                        y="-12"
+                        y="-11"
                         textAnchor="middle"
                         fill="#ffffff"
                         fontSize="8.5"
                         fontWeight="bold"
                       >
-                        {mapOverlay === 'hospital'
-                          ? area.capacityGap > 0
-                            ? `+${area.capacityGap}`
-                            : `${area.currentPatients}`
-                          : area.riskScore100}
+                        {mapOverlay === 'hospital' ? (
+                          area.capacityGap > 0 ? `+${area.capacityGap}` : `${area.currentPatients}`
+                        ) : isCompareMode ? (
+                          `'26:${area.riskScore100} v '25:${area.priorYearRiskScore}`
+                        ) : (
+                          `${area.riskScore100} ${
+                            area.trend === 'rising' ? '↑' : area.trend === 'falling' ? '↓' : '→'
+                          }`
+                        )}
                       </text>
                     </g>
                   </g>
@@ -395,9 +419,9 @@ export const DhakaMap: React.FC<DhakaMapProps> = ({
             {/* Hover Tooltip Overlay */}
             {hoveredArea && (
               <div
-                className="absolute pointer-events-none z-30 bg-slate-900/95 border border-slate-700/90 rounded-xl p-3 shadow-2xl backdrop-blur text-xs w-60"
+                className="absolute pointer-events-none z-30 bg-slate-900/95 border border-slate-700/90 rounded-xl p-3 shadow-2xl backdrop-blur text-xs w-64"
                 style={{
-                  left: Math.min(mousePos.x + 15, 340),
+                  left: Math.min(mousePos.x + 15, 330),
                   top: Math.max(mousePos.y - 40, 10),
                 }}
               >
@@ -413,9 +437,36 @@ export const DhakaMap: React.FC<DhakaMapProps> = ({
                 </div>
 
                 <div className="space-y-1.5 text-slate-300">
-                  <div className="flex justify-between">
+                  <div className="flex justify-between items-center">
                     <span className="text-slate-400">Risk Score:</span>
-                    <span className="font-bold text-amber-400">{hoveredArea.riskScore100} / 100</span>
+                    <span className="font-bold text-amber-400 flex items-center gap-1">
+                      <span>{hoveredArea.riskScore100} / 100</span>
+                      {/* Trend Arrow */}
+                      <span
+                        className={`font-black text-xs ${
+                          hoveredArea.trend === 'rising'
+                            ? 'text-red-400'
+                            : hoveredArea.trend === 'falling'
+                            ? 'text-emerald-400'
+                            : 'text-slate-400'
+                        }`}
+                      >
+                        {hoveredArea.trend === 'rising'
+                          ? '↑ Rising'
+                          : hoveredArea.trend === 'falling'
+                          ? '↓ Falling'
+                          : '→ Stable'}
+                      </span>
+                    </span>
+                  </div>
+
+                  {/* Year over Year Comparison line */}
+                  <div className="p-1.5 bg-amber-500/10 border border-amber-500/20 rounded-lg text-[10px] text-amber-200">
+                    <div className="font-semibold">{hoveredArea.yearOverYearText}</div>
+                    <div className="flex justify-between text-slate-400 mt-0.5">
+                      <span>2026: {hoveredArea.riskScore100} pts</span>
+                      <span>2025: {hoveredArea.priorYearRiskScore} pts</span>
+                    </div>
                   </div>
 
                   <div className="pt-1 border-t border-slate-800/80 space-y-1">

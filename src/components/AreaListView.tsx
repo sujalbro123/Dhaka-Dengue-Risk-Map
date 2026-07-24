@@ -156,10 +156,41 @@ export const AreaListView: React.FC<AreaListViewProps> = ({
                     </div>
 
                     <div
-                      className={`px-2 py-0.5 rounded-md text-[11px] font-bold border ${badge.bg} ${badge.text} ${badge.border}`}
+                      className={`px-2 py-0.5 rounded-md text-[11px] font-bold border flex items-center gap-1 ${badge.bg} ${badge.text} ${badge.border}`}
                     >
-                      {area.riskScore100} / 100
+                      <span>{area.riskScore100} / 100</span>
+                      {/* Trend Arrow (Requirement D) */}
+                      <span
+                        title={`Last week: ${area.lastWeekRiskScore}`}
+                        className={`font-black text-xs ${
+                          area.trend === 'rising'
+                            ? 'text-red-400'
+                            : area.trend === 'falling'
+                            ? 'text-emerald-400'
+                            : 'text-slate-400'
+                        }`}
+                      >
+                        {area.trend === 'rising' ? '↑' : area.trend === 'falling' ? '↓' : '→'}
+                      </span>
                     </div>
+                  </div>
+
+                  {/* Year-over-Year comparison pill */}
+                  <div className="text-[10px] text-slate-300 font-medium bg-slate-900/90 px-2 py-1 rounded-md border border-slate-800 flex items-center justify-between mt-1">
+                    <span className="text-slate-400">vs 2025:</span>
+                    <span
+                      className={`font-bold ${
+                        area.yearOverYearChangePercent > 0
+                          ? 'text-red-400'
+                          : area.yearOverYearChangePercent < 0
+                          ? 'text-emerald-400'
+                          : 'text-slate-400'
+                      }`}
+                    >
+                      {area.yearOverYearChangePercent > 0
+                        ? `+${area.yearOverYearChangePercent}% YoY`
+                        : `${area.yearOverYearChangePercent}% YoY`}
+                    </span>
                   </div>
 
                   {/* Factors quick breakdown */}
@@ -207,6 +238,8 @@ export const AreaListView: React.FC<AreaListViewProps> = ({
                     <ArrowUpDown className="w-3 h-3" />
                   </div>
                 </th>
+                <th className="p-3">Trend</th>
+                <th className="p-3">vs Last Year (YoY)</th>
                 <th className="p-3 cursor-pointer hover:text-white" onClick={() => toggleSort('cases')}>
                   <div className="flex items-center gap-1">
                     <span>30d Cases (50%)</span>
@@ -253,6 +286,35 @@ export const AreaListView: React.FC<AreaListViewProps> = ({
                       >
                         {area.riskScore100} / 100 ({area.riskLevel.toUpperCase()})
                       </span>
+                    </td>
+                    <td className="p-3 font-bold text-sm">
+                      <span
+                        className={
+                          area.trend === 'rising'
+                            ? 'text-red-400'
+                            : area.trend === 'falling'
+                            ? 'text-emerald-400'
+                            : 'text-slate-400'
+                        }
+                      >
+                        {area.trend === 'rising' ? '↑ Rising' : area.trend === 'falling' ? '↓ Falling' : '→ Stable'}
+                      </span>
+                    </td>
+                    <td className="p-3 font-semibold">
+                      <span
+                        className={
+                          area.yearOverYearChangePercent > 0
+                            ? 'text-red-400'
+                            : area.yearOverYearChangePercent < 0
+                            ? 'text-emerald-400'
+                            : 'text-slate-400'
+                        }
+                      >
+                        {area.yearOverYearChangePercent > 0
+                          ? `+${area.yearOverYearChangePercent}%`
+                          : `${area.yearOverYearChangePercent}%`}
+                      </span>
+                      <span className="text-[10px] text-slate-500 block">(2025: {area.priorYearRiskScore})</span>
                     </td>
                     <td className="p-3 font-semibold text-slate-200">{area.recentCases30d}</td>
                     <td className="p-3 font-semibold text-cyan-400">{area.recentRainfallMm} mm</td>

@@ -14,12 +14,19 @@ import { CsvDataModal } from './components/CsvDataModal';
 import { CriticalRiskToast } from './components/CriticalRiskToast';
 import { SmsAlertModal } from './components/SmsAlertModal';
 import { ReportCaseModal } from './components/ReportCaseModal';
+import { WhatIfRainfallSlider } from './components/WhatIfRainfallSlider';
 
 export default function App() {
   const [areasData, setAreasData] = useState<DhakaArea[]>(INITIAL_DHAKA_AREAS);
   const [selectedScenarioId, setSelectedScenarioId] = useState<string>('current-jul');
   const [weights, setWeights] = useState<ModelWeights>(DEFAULT_WEIGHTS);
   const [modifiers, setModifiers] = useState<SimulationModifiers>(DEFAULT_MODIFIERS);
+
+  // Requirement E: Year-over-Year Compare Mode state
+  const [isCompareMode, setIsCompareMode] = useState<boolean>(false);
+
+  // Requirement F: What-if rainfall state
+  const [whatIfRainfallMm, setWhatIfRainfallMm] = useState<number | null>(null);
 
   const [selectedAreaId, setSelectedAreaId] = useState<string | null>('old-dhaka');
   const [viewMode, setViewMode] = useState<'map' | 'grid' | 'table'>('map');
@@ -41,10 +48,25 @@ export default function App() {
   // Critical notification toast dismissal state
   const [isCriticalToastDismissed, setIsCriticalToastDismissed] = useState<boolean>(false);
 
+  // Compute average actual rainfall across areas for slider baseline
+  const avgActualRainfallMm = useMemo(() => {
+    if (areasData.length === 0) return 120;
+    const sum = areasData.reduce((acc, a) => acc + a.recentRainfallMm, 0);
+    return Math.round(sum / areasData.length);
+  }, [areasData]);
+
+  // Combined modifiers including what-if override
+  const activeModifiers = useMemo(() => {
+    return {
+      ...modifiers,
+      whatIfRainfallMm,
+    };
+  }, [modifiers, whatIfRainfallMm]);
+
   // Compute live risk scores for all areas whenever dataset, weights, or modifiers change
   const computedAreas = useMemo(() => {
-    return calculateAreaRisks(areasData, weights, modifiers);
-  }, [areasData, weights, modifiers]);
+    return calculateAreaRisks(areasData, weights, activeModifiers);
+  }, [areasData, weights, activeModifiers]);
 
   // Handle adding new sent alert
   const handleSendAlert = (newAlert: SentAlertLog) => {
@@ -154,6 +176,15 @@ export default function App() {
         {/* City Summary Stats KPI Bar */}
         <SummaryStats computedAreas={computedAreas} />
 
+        {/* What-If Rainfall Slider (Requirement F) */}
+        <div className="mb-4">
+          <WhatIfRainfallSlider
+            whatIfRainfallMm={whatIfRainfallMm}
+            onChangeWhatIfRainfall={setWhatIfRainfallMm}
+            avgActualRainfallMm={avgActualRainfallMm}
+          />
+        </div>
+
         {/* Interactive Model Simulation Sliders (Collapsible) */}
         <SimulationControls
           weights={weights}
@@ -183,6 +214,8 @@ export default function App() {
                 viewMode={viewMode}
                 onChangeViewMode={setViewMode}
                 onOpenSmsAlert={(id) => handleOpenSmsModal(id)}
+                isCompareMode={isCompareMode}
+                onToggleCompareMode={() => setIsCompareMode((prev) => !prev)}
               />
             ) : (
               <div className="bg-[#0f1218] border border-slate-800 rounded-2xl p-4 shadow-xl flex-1 flex flex-col">
