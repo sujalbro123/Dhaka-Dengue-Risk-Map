@@ -6,6 +6,8 @@ export interface MonthlyRecord {
   rainfallMm: number;
 }
 
+export type CapacityStatus = 'adequate' | 'strained' | 'overcapacity';
+
 export interface DhakaArea {
   id: string;
   name: string;
@@ -23,6 +25,9 @@ export interface DhakaArea {
   preventionTips: string[];
   keyRiskFactors: string[];
   primaryHospitals: string[];
+  hospitalBeds: number; // Dedicated dengue beds in zone
+  currentPatients: number; // Current admitted dengue patients
+  crowdsourcedReports: number; // Community unverified case count
   coordinates: { x: number; y: number }; // Center coordinate on custom SVG map
   svgPath: string; // Vector polygon path for map
 }
@@ -41,6 +46,32 @@ export interface ComputedAreaRisk extends DhakaArea {
   weightedCasesContribution: number; // 0.5 * normCases
   weightedRainfallContribution: number; // 0.3 * normRainfall
   weightedDensityContribution: number; // 0.2 * normDensity
+  capacityGap: number; // currentPatients - hospitalBeds (positive = shortage, negative = available)
+  capacityStatus: CapacityStatus;
+}
+
+export interface CommunityReport {
+  id: string;
+  areaId: string;
+  areaName: string;
+  date: string;
+  patientType: string;
+  symptoms: string[];
+  landmark?: string;
+  comments?: string;
+  timestamp: string;
+}
+
+export interface SentAlertLog {
+  id: string;
+  areaId: string;
+  areaName: string;
+  riskScore: number;
+  riskLevel: RiskLevel;
+  channel: 'SMS' | 'Emergency Push' | 'Public Broadcast';
+  message: string;
+  recipientCount: number;
+  timestamp: string;
 }
 
 export interface ModelWeights {

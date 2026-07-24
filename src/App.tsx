@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useEffect } from 'react';
-import { DhakaArea, ModelWeights, SimulationModifiers, ComputedAreaRisk } from './types';
-import { INITIAL_DHAKA_AREAS, PRESET_SCENARIOS } from './data/dhakaData';
+import { DhakaArea, ModelWeights, SimulationModifiers, ComputedAreaRisk, SentAlertLog, CommunityReport } from './types';
+import { INITIAL_DHAKA_AREAS, PRESET_SCENARIOS, INITIAL_SENT_ALERTS, INITIAL_COMMUNITY_REPORTS } from './data/dhakaData';
 import { calculateAreaRisks, DEFAULT_WEIGHTS, DEFAULT_MODIFIERS } from './utils/riskCalculator';
 
 import { Header } from './components/Header';
@@ -12,6 +12,8 @@ import { SimulationControls } from './components/SimulationControls';
 import { HowItWorksModal } from './components/HowItWorksModal';
 import { CsvDataModal } from './components/CsvDataModal';
 import { CriticalRiskToast } from './components/CriticalRiskToast';
+import { SmsAlertModal } from './components/SmsAlertModal';
+import { ReportCaseModal } from './components/ReportCaseModal';
 
 export default function App() {
   const [areasData, setAreasData] = useState<DhakaArea[]>(INITIAL_DHAKA_AREAS);
@@ -26,6 +28,16 @@ export default function App() {
   const [isHowItWorksOpen, setIsHowItWorksOpen] = useState<boolean>(false);
   const [isCsvModalOpen, setIsCsvModalOpen] = useState<boolean>(false);
 
+  // SMS Alert Simulation State
+  const [isSmsModalOpen, setIsSmsModalOpen] = useState<boolean>(false);
+  const [smsTargetAreaId, setSmsTargetAreaId] = useState<string | undefined>(undefined);
+  const [sentAlerts, setSentAlerts] = useState<SentAlertLog[]>(INITIAL_SENT_ALERTS);
+
+  // Community Case Reporting State
+  const [isReportModalOpen, setIsReportModalOpen] = useState<boolean>(false);
+  const [reportTargetAreaId, setReportTargetAreaId] = useState<string | undefined>(undefined);
+  const [communityReports, setCommunityReports] = useState<CommunityReport[]>(INITIAL_COMMUNITY_REPORTS);
+
   // Critical notification toast dismissal state
   const [isCriticalToastDismissed, setIsCriticalToastDismissed] = useState<boolean>(false);
 
@@ -33,6 +45,34 @@ export default function App() {
   const computedAreas = useMemo(() => {
     return calculateAreaRisks(areasData, weights, modifiers);
   }, [areasData, weights, modifiers]);
+
+  // Handle adding new sent alert
+  const handleSendAlert = (newAlert: SentAlertLog) => {
+    setSentAlerts((prev) => [newAlert, ...prev]);
+  };
+
+  // Handle submitting community report
+  const handleSubmitCommunityReport = (newReport: CommunityReport) => {
+    setCommunityReports((prev) => [newReport, ...prev]);
+    // Increment crowdsourced reports in state for this area
+    setAreasData((prevAreas) =>
+      prevAreas.map((area) =>
+        area.id === newReport.areaId
+          ? { ...area, crowdsourcedReports: (area.crowdsourcedReports || 0) + 1 }
+          : area
+      )
+    );
+  };
+
+  const handleOpenSmsModal = (areaId?: string) => {
+    setSmsTargetAreaId(areaId || selectedAreaId || undefined);
+    setIsSmsModalOpen(true);
+  };
+
+  const handleOpenReportModal = (areaId?: string) => {
+    setReportTargetAreaId(areaId || selectedAreaId || undefined);
+    setIsReportModalOpen(true);
+  };
 
   // Identify areas that hit or exceed critical risk threshold (score >= 80 or raw >= 0.80)
   const criticalAreas = useMemo(() => {
@@ -104,6 +144,9 @@ export default function App() {
         onOpenCsvModal={() => setIsCsvModalOpen(true)}
         onToggleSimControls={() => setIsSimControlsOpen((prev) => !prev)}
         isSimControlsOpen={isSimControlsOpen}
+        onOpenSmsAlert={() => handleOpenSmsModal()}
+        onOpenReportCase={() => handleOpenReportModal()}
+        sentAlertsCount={sentAlerts.length}
       />
 
       {/* Main Container */}
@@ -139,6 +182,7 @@ export default function App() {
                 onSelectArea={(area) => setSelectedAreaId(area.id)}
                 viewMode={viewMode}
                 onChangeViewMode={setViewMode}
+                onOpenSmsAlert={(id) => handleOpenSmsModal(id)}
               />
             ) : (
               <div className="bg-[#0f1218] border border-slate-800 rounded-2xl p-4 shadow-xl flex-1 flex flex-col">
@@ -184,7 +228,11 @@ export default function App() {
 
           {/* Right Column: Selected Area Intelligence Panel */}
           <div className="lg:col-span-5 xl:col-span-5 h-full">
-            <AreaDetailPanel area={selectedArea} />
+            <AreaDetailPanel
+              area={selectedArea}
+              onOpenSmsAlert={(id) => handleOpenSmsModal(id)}
+              onOpenReportCase={(id) => handleOpenReportModal(id)}
+            />
           </div>
         </div>
       </main>
@@ -220,6 +268,23 @@ export default function App() {
         onClose={() => setIsCsvModalOpen(false)}
         computedAreas={computedAreas}
         onImportCustomData={handleImportCustomData}
+      />
+
+      <SmsAlertModal
+        isOpen={isSmsModalOpen}
+        onClose={() => setIsSmsModalOpen(false)}
+        areas={computedAreas}
+        initialAreaId={smsTargetAreaId}
+        onSendAlert={handleSendAlert}
+        sentAlerts={sentAlerts}
+      />
+
+      <ReportCaseModal
+        isOpen={isReportModalOpen}
+        onClose={() => setIsReportModalOpen(false)}
+        areas={computedAreas}
+        initialAreaId={reportTargetAreaId}
+        onSubmitReport={handleSubmitCommunityReport}
       />
     </div>
   );

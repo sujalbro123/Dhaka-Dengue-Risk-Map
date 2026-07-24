@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { ComputedAreaRisk } from '../types';
 import { getRiskBadgeColor } from '../utils/riskCalculator';
-import { ZoomIn, ZoomOut, RotateCcw, Map as MapIcon, Grid, TableProperties, Sparkles, Navigation } from 'lucide-react';
+import { ZoomIn, ZoomOut, RotateCcw, Map as MapIcon, Grid, TableProperties, Navigation, Hospital, ShieldAlert, Users } from 'lucide-react';
 
 interface DhakaMapProps {
   areas: ComputedAreaRisk[];
@@ -9,6 +9,7 @@ interface DhakaMapProps {
   onSelectArea: (area: ComputedAreaRisk) => void;
   viewMode: 'map' | 'grid' | 'table';
   onChangeViewMode: (mode: 'map' | 'grid' | 'table') => void;
+  onOpenSmsAlert?: (areaId: string) => void;
 }
 
 export const DhakaMap: React.FC<DhakaMapProps> = ({
@@ -17,10 +18,12 @@ export const DhakaMap: React.FC<DhakaMapProps> = ({
   onSelectArea,
   viewMode,
   onChangeViewMode,
+  onOpenSmsAlert,
 }) => {
   const [zoom, setZoom] = useState(1);
   const [hoveredArea, setHoveredArea] = useState<ComputedAreaRisk | null>(null);
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
+  const [mapOverlay, setMapOverlay] = useState<'risk' | 'hospital'>('risk');
 
   const handleZoomIn = () => setZoom((prev) => Math.min(prev + 0.25, 2.0));
   const handleZoomOut = () => setZoom((prev) => Math.max(prev - 0.25, 0.75));
@@ -116,31 +119,76 @@ export const DhakaMap: React.FC<DhakaMapProps> = ({
             </button>
           </div>
 
-          {/* Compass & Scale */}
-          <div className="absolute top-3 left-3 z-10 flex items-center gap-1.5 px-2.5 py-1 bg-slate-900/80 backdrop-blur border border-slate-800 rounded-lg text-[11px] text-slate-400">
-            <Navigation className="w-3.5 h-3.5 text-emerald-400 rotate-0" />
-            <span>Dhaka Metropolitan Area</span>
+          {/* Compass, Scale & Layer Switcher */}
+          <div className="absolute top-3 left-3 z-10 flex flex-wrap items-center gap-2">
+            <div className="flex items-center gap-1.5 px-2.5 py-1.5 bg-slate-900/90 backdrop-blur border border-slate-800 rounded-xl text-[11px] text-slate-300">
+              <Navigation className="w-3.5 h-3.5 text-emerald-400" />
+              <span>Dhaka City Corporation</span>
+            </div>
+
+            {/* Layer Toggle Pill */}
+            <div className="flex items-center bg-slate-900/90 backdrop-blur p-1 rounded-xl border border-slate-800">
+              <button
+                onClick={() => setMapOverlay('risk')}
+                className={`px-2.5 py-1 text-[11px] font-bold rounded-lg transition-all flex items-center gap-1 ${
+                  mapOverlay === 'risk'
+                    ? 'bg-red-500 text-white shadow-sm'
+                    : 'text-slate-400 hover:text-slate-200'
+                }`}
+              >
+                <ShieldAlert className="w-3 h-3" />
+                Risk Heatmap
+              </button>
+              <button
+                onClick={() => setMapOverlay('hospital')}
+                className={`px-2.5 py-1 text-[11px] font-bold rounded-lg transition-all flex items-center gap-1 ${
+                  mapOverlay === 'hospital'
+                    ? 'bg-rose-500 text-white shadow-sm'
+                    : 'text-slate-400 hover:text-slate-200'
+                }`}
+              >
+                <Hospital className="w-3 h-3" />
+                Hospital Capacity Gap
+              </button>
+            </div>
           </div>
 
           {/* Map Legend */}
           <div className="absolute bottom-3 left-3 z-10 bg-slate-900/90 backdrop-blur border border-slate-800 rounded-xl p-2.5 text-xs shadow-md">
-            <div className="font-semibold text-slate-300 mb-1.5 text-[11px] uppercase tracking-wider">
-              Risk Level Legend
+            <div className="font-bold text-slate-300 mb-1.5 text-[10px] uppercase tracking-wider">
+              {mapOverlay === 'risk' ? 'Epidemiology Risk Legend' : 'Hospital Bed Capacity Status'}
             </div>
-            <div className="flex flex-col gap-1.5">
-              <div className="flex items-center gap-2">
-                <span className="w-3 h-3 rounded-full bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.6)]"></span>
-                <span className="text-slate-200">High Risk (Score ≥ 65)</span>
+            {mapOverlay === 'risk' ? (
+              <div className="flex flex-col gap-1.5 text-[11px]">
+                <div className="flex items-center gap-2">
+                  <span className="w-3 h-3 rounded-full bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.6)]"></span>
+                  <span className="text-slate-200">High Risk (Score ≥ 65)</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="w-3 h-3 rounded-full bg-amber-500"></span>
+                  <span className="text-slate-200">Moderate Risk (40 - 64)</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="w-3 h-3 rounded-full bg-emerald-500"></span>
+                  <span className="text-slate-200">Low Risk (&lt; 40)</span>
+                </div>
               </div>
-              <div className="flex items-center gap-2">
-                <span className="w-3 h-3 rounded-full bg-amber-500"></span>
-                <span className="text-slate-200">Moderate Risk (40 - 64)</span>
+            ) : (
+              <div className="flex flex-col gap-1.5 text-[11px]">
+                <div className="flex items-center gap-2">
+                  <span className="w-3 h-3 rounded-full bg-red-600 shadow-[0_0_8px_rgba(239,68,68,0.6)]"></span>
+                  <span className="text-slate-200">🔴 Overcapacity (Bed Shortage)</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="w-3 h-3 rounded-full bg-amber-500"></span>
+                  <span className="text-slate-200">🟠 Strained (≥80% Full)</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="w-3 h-3 rounded-full bg-emerald-500"></span>
+                  <span className="text-slate-200">🟢 Adequate (&lt;80% Full)</span>
+                </div>
               </div>
-              <div className="flex items-center gap-2">
-                <span className="w-3 h-3 rounded-full bg-emerald-500"></span>
-                <span className="text-slate-200">Low Risk (&lt; 40)</span>
-              </div>
-            </div>
+            )}
           </div>
 
           {/* SVG Map Container */}
@@ -239,8 +287,15 @@ export const DhakaMap: React.FC<DhakaMapProps> = ({
                 const badgeColor = getRiskBadgeColor(area.riskLevel);
 
                 let fillGradient = 'url(#grad-low)';
-                if (area.riskLevel === 'high') fillGradient = 'url(#grad-high)';
-                if (area.riskLevel === 'moderate') fillGradient = 'url(#grad-moderate)';
+                if (mapOverlay === 'risk') {
+                  if (area.riskLevel === 'high') fillGradient = 'url(#grad-high)';
+                  if (area.riskLevel === 'moderate') fillGradient = 'url(#grad-moderate)';
+                } else {
+                  // Hospital overlay fill
+                  if (area.capacityStatus === 'overcapacity') fillGradient = 'url(#grad-high)';
+                  else if (area.capacityStatus === 'strained') fillGradient = 'url(#grad-moderate)';
+                  else fillGradient = 'url(#grad-low)';
+                }
 
                 return (
                   <g key={area.id} className="transition-all duration-200">
@@ -261,8 +316,9 @@ export const DhakaMap: React.FC<DhakaMapProps> = ({
                       className="pointer-events-none"
                       transform={`translate(${area.coordinates.x}, ${area.coordinates.y})`}
                     >
-                      {/* Pulse Circle for High Risk Areas */}
-                      {area.riskLevel === 'high' && (
+                      {/* Pulse Circle for High Risk or Overcapacity Areas */}
+                      {((mapOverlay === 'risk' && area.riskLevel === 'high') ||
+                        (mapOverlay === 'hospital' && area.capacityStatus === 'overcapacity')) && (
                         <circle
                           r="10"
                           fill="#ef4444"
@@ -274,7 +330,15 @@ export const DhakaMap: React.FC<DhakaMapProps> = ({
                       {/* Center Pin */}
                       <circle
                         r={isSelected ? '7' : '5'}
-                        fill={badgeColor.fill}
+                        fill={
+                          mapOverlay === 'hospital'
+                            ? area.capacityStatus === 'overcapacity'
+                              ? '#ef4444'
+                              : area.capacityStatus === 'strained'
+                              ? '#f59e0b'
+                              : '#10b981'
+                            : badgeColor.fill
+                        }
                         stroke="#ffffff"
                         strokeWidth="1.5"
                       />
@@ -291,15 +355,21 @@ export const DhakaMap: React.FC<DhakaMapProps> = ({
                         {area.name}
                       </text>
 
-                      {/* Risk Score Pill */}
+                      {/* Score or Bed Pill */}
                       <rect
-                        x="-14"
+                        x="-16"
                         y="-22"
-                        width="28"
+                        width="32"
                         height="14"
                         rx="7"
                         fill="#0f172a"
-                        stroke={badgeColor.fill}
+                        stroke={
+                          mapOverlay === 'hospital'
+                            ? area.capacityGap > 0
+                              ? '#ef4444'
+                              : '#38bdf8'
+                            : badgeColor.fill
+                        }
                         strokeWidth="1"
                       />
                       <text
@@ -307,10 +377,14 @@ export const DhakaMap: React.FC<DhakaMapProps> = ({
                         y="-12"
                         textAnchor="middle"
                         fill="#ffffff"
-                        fontSize="9"
+                        fontSize="8.5"
                         fontWeight="bold"
                       >
-                        {area.riskScore100}
+                        {mapOverlay === 'hospital'
+                          ? area.capacityGap > 0
+                            ? `+${area.capacityGap}`
+                            : `${area.currentPatients}`
+                          : area.riskScore100}
                       </text>
                     </g>
                   </g>
@@ -321,9 +395,9 @@ export const DhakaMap: React.FC<DhakaMapProps> = ({
             {/* Hover Tooltip Overlay */}
             {hoveredArea && (
               <div
-                className="absolute pointer-events-none z-30 bg-slate-900/95 border border-slate-700/90 rounded-xl p-3 shadow-2xl backdrop-blur text-xs w-52"
+                className="absolute pointer-events-none z-30 bg-slate-900/95 border border-slate-700/90 rounded-xl p-3 shadow-2xl backdrop-blur text-xs w-60"
                 style={{
-                  left: Math.min(mousePos.x + 15, 360),
+                  left: Math.min(mousePos.x + 15, 340),
                   top: Math.max(mousePos.y - 40, 10),
                 }}
               >
@@ -337,24 +411,36 @@ export const DhakaMap: React.FC<DhakaMapProps> = ({
                     {hoveredArea.riskLevel.toUpperCase()}
                   </span>
                 </div>
-                <div className="space-y-1 text-slate-300">
+
+                <div className="space-y-1.5 text-slate-300">
                   <div className="flex justify-between">
                     <span className="text-slate-400">Risk Score:</span>
                     <span className="font-bold text-amber-400">{hoveredArea.riskScore100} / 100</span>
                   </div>
-                  <div className="flex justify-between">
-                    <span className="text-slate-400">30d Cases:</span>
-                    <span className="font-semibold text-white">{hoveredArea.recentCases30d}</span>
+
+                  <div className="pt-1 border-t border-slate-800/80 space-y-1">
+                    <div className="flex justify-between">
+                      <span className="text-slate-400">Dengue Patients:</span>
+                      <span className="font-semibold text-red-400">{hoveredArea.currentPatients}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-slate-400">Hospital Beds:</span>
+                      <span className="font-semibold text-blue-400">{hoveredArea.hospitalBeds}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-slate-400">Bed Capacity Status:</span>
+                      <span className={`font-bold ${
+                        hoveredArea.capacityStatus === 'overcapacity' ? 'text-red-400' :
+                        hoveredArea.capacityStatus === 'strained' ? 'text-amber-400' : 'text-emerald-400'
+                      }`}>
+                        {hoveredArea.capacityStatus.toUpperCase()}
+                      </span>
+                    </div>
                   </div>
-                  <div className="flex justify-between">
-                    <span className="text-slate-400">Rainfall:</span>
-                    <span className="font-semibold text-cyan-400">{hoveredArea.recentRainfallMm} mm</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-slate-400">Density:</span>
-                    <span className="font-semibold text-slate-300">
-                      {hoveredArea.populationDensity.toLocaleString()} /km²
-                    </span>
+
+                  <div className="pt-1 border-t border-slate-800/80 flex justify-between text-[11px]">
+                    <span className="text-slate-400">Community Reports:</span>
+                    <span className="font-semibold text-purple-300">{hoveredArea.crowdsourcedReports} reports</span>
                   </div>
                 </div>
               </div>

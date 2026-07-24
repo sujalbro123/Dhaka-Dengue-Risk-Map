@@ -1,4 +1,4 @@
-import { DhakaArea, PresetScenario } from '../types';
+import { DhakaArea, PresetScenario, CommunityReport, SentAlertLog } from '../types';
 
 export const INITIAL_DHAKA_AREAS: DhakaArea[] = [
   {
@@ -34,6 +34,9 @@ export const INITIAL_DHAKA_AREAS: DhakaArea[] = [
       'Frequent localized waterlogging after heavy rain.',
     ],
     primaryHospitals: ['Mirpur General Hospital', 'Monowara Hospital', 'BIRDEM-2 Mirpur'],
+    hospitalBeds: 450,
+    currentPatients: 520,
+    crowdsourcedReports: 142,
     coordinates: { x: 260, y: 190 },
     // Stylized SVG polygon path for Mirpur (North-West)
     svgPath: 'M 190,130 L 320,110 L 330,220 L 250,260 L 170,220 Z',
@@ -70,6 +73,9 @@ export const INITIAL_DHAKA_AREAS: DhakaArea[] = [
       'High incidence of indoor plant saucers and luxury gardens.',
     ],
     primaryHospitals: ['Kuwait Bangladesh Friendship Govt Hospital', 'Uttara Adhunik Medical College'],
+    hospitalBeds: 350,
+    currentPatients: 280,
+    crowdsourcedReports: 64,
     coordinates: { x: 370, y: 90 },
     // Uttara (Far North)
     svgPath: 'M 300,30 L 450,20 L 460,110 L 320,110 Z',
@@ -105,6 +111,9 @@ export const INITIAL_DHAKA_AREAS: DhakaArea[] = [
       'Unattended rooftop gardens in vacant commercial towers.',
     ],
     primaryHospitals: ['United Hospital Gulshan', 'Evercare Hospital (Nearby)', 'Labaid Banani'],
+    hospitalBeds: 400,
+    currentPatients: 190,
+    crowdsourcedReports: 35,
     coordinates: { x: 410, y: 190 },
     // Gulshan/Banani (North East)
     svgPath: 'M 330,110 L 470,110 L 460,220 L 330,220 Z',
@@ -141,6 +150,9 @@ export const INITIAL_DHAKA_AREAS: DhakaArea[] = [
       'Shaded perimeter around Dhanmondi Lake.',
     ],
     primaryHospitals: ['Anwer Khan Modern Hospital', 'Labaid Specialized Hospital', 'Green Life Hospital'],
+    hospitalBeds: 380,
+    currentPatients: 410,
+    crowdsourcedReports: 110,
     coordinates: { x: 280, y: 310 },
     // Dhanmondi (Central West)
     svgPath: 'M 250,260 L 330,250 L 320,350 L 230,350 Z',
@@ -177,6 +189,9 @@ export const INITIAL_DHAKA_AREAS: DhakaArea[] = [
       'High Breteau Index (>40) indicating rampant Aedes breeding.',
     ],
     primaryHospitals: ['Shaheed Suhrawardy Medical College Hospital', 'National Institute of Traumatology (NITOR)'],
+    hospitalBeds: 500,
+    currentPatients: 620,
+    crowdsourcedReports: 185,
     coordinates: { x: 200, y: 300 },
     // Mohammadpur (West)
     svgPath: 'M 140,230 L 250,260 L 230,350 L 130,320 Z',
@@ -213,6 +228,9 @@ export const INITIAL_DHAKA_AREAS: DhakaArea[] = [
       'Uncovered household water drums due to intermittent municipal supply.',
     ],
     primaryHospitals: ['Sir Salimullah Medical College Hospital (Mitford)', 'Dhaka Medical College Hospital (DMCH)'],
+    hospitalBeds: 700,
+    currentPatients: 890,
+    crowdsourcedReports: 230,
     coordinates: { x: 280, y: 440 },
     // Old Dhaka (South)
     svgPath: 'M 200,400 L 340,390 L 350,510 L 200,500 Z',
@@ -249,6 +267,9 @@ export const INITIAL_DHAKA_AREAS: DhakaArea[] = [
       'Rapid unregulated construction.',
     ],
     primaryHospitals: ['Farazy Hospital Rampura', 'AMZ Hospital Badda'],
+    hospitalBeds: 300,
+    currentPatients: 360,
+    crowdsourcedReports: 95,
     coordinates: { x: 420, y: 270 },
     // Badda & Rampura (East)
     svgPath: 'M 330,220 L 480,220 L 490,320 L 330,310 Z',
@@ -284,6 +305,9 @@ export const INITIAL_DHAKA_AREAS: DhakaArea[] = [
       'Underground parking lots with sumps prone to stagnant leakage.',
     ],
     primaryHospitals: ['Islami Bank Central Hospital Kakrail', 'Dhaka Medical College (Nearby)'],
+    hospitalBeds: 320,
+    currentPatients: 290,
+    crowdsourcedReports: 58,
     coordinates: { x: 370, y: 350 },
     // Motijheel/Paltan (Central South)
     svgPath: 'M 320,310 L 410,310 L 410,390 L 330,390 Z',
@@ -320,6 +344,9 @@ export const INITIAL_DHAKA_AREAS: DhakaArea[] = [
       'High density mixed industrial and residential housing.',
     ],
     primaryHospitals: ['Asgar Ali Hospital Gandaria', 'Dhaka Medical College Hospital'],
+    hospitalBeds: 450,
+    currentPatients: 580,
+    crowdsourcedReports: 170,
     coordinates: { x: 420, y: 440 },
     // Jatrabari (South East)
     svgPath: 'M 380,390 L 510,380 L 520,500 L 350,510 Z',
@@ -355,6 +382,9 @@ export const INITIAL_DHAKA_AREAS: DhakaArea[] = [
       'Uncovered plastic containers around local wet markets.',
     ],
     primaryHospitals: ['Khilgaon General Hospital', 'Mugda Medical College Hospital'],
+    hospitalBeds: 350,
+    currentPatients: 340,
+    crowdsourcedReports: 82,
     coordinates: { x: 440, y: 340 },
     // Khilgaon (East Central)
     svgPath: 'M 410,310 L 510,320 L 500,380 L 410,390 Z',
@@ -390,6 +420,9 @@ export const INITIAL_DHAKA_AREAS: DhakaArea[] = [
       'Open industrial water collection tanks.',
     ],
     primaryHospitals: ['National Institute of ENT Tejgaon', 'Metropolitan Medical Centre'],
+    hospitalBeds: 280,
+    currentPatients: 310,
+    crowdsourcedReports: 78,
     coordinates: { x: 330, y: 220 },
     // Tejgaon (Center)
     svgPath: 'M 280,180 L 360,180 L 350,260 L 260,250 Z',
@@ -425,6 +458,9 @@ export const INITIAL_DHAKA_AREAS: DhakaArea[] = [
       'Otherwise high civic management and low Breteau index.',
     ],
     primaryHospitals: ['Combined Military Hospital (CMH) Dhaka', 'Kurmitola General Hospital'],
+    hospitalBeds: 500,
+    currentPatients: 110,
+    crowdsourcedReports: 18,
     coordinates: { x: 310, y: 140 },
     // Cantonment (North Center)
     svgPath: 'M 260,110 L 340,110 L 330,180 L 250,180 Z',
@@ -471,5 +507,88 @@ export const PRESET_SCENARIOS: PresetScenario[] = [
       caseMultiplier: 0.7,
       densityModifier: 1.0,
     },
+  },
+];
+
+export const INITIAL_COMMUNITY_REPORTS: CommunityReport[] = [
+  {
+    id: 'rep-101',
+    areaId: 'old-dhaka',
+    areaName: 'Old Dhaka (Kotwali & Lalbagh)',
+    date: '2026-07-22',
+    patientType: 'Family member',
+    symptoms: ['High Fever (>102°F)', 'Retro-orbital Pain (behind eyes)', 'Severe Joint Aches'],
+    landmark: 'Near Lalbagh Fort Road, Ward 24',
+    comments: 'Patient admitted to DMCH emergency with platelet drop.',
+    timestamp: '10:15 AM today',
+  },
+  {
+    id: 'rep-102',
+    areaId: 'mohammadpur',
+    areaName: 'Mohammadpur',
+    date: '2026-07-22',
+    patientType: 'Self',
+    symptoms: ['High Fever (>102°F)', 'Skin Rash', 'Nausea/Vomiting'],
+    landmark: 'Tajmahal Road Block C',
+    comments: 'Multiple neighbors in apartment building experiencing high fever.',
+    timestamp: '11:40 AM today',
+  },
+  {
+    id: 'rep-103',
+    areaId: 'mirpur',
+    areaName: 'Mirpur',
+    date: '2026-07-21',
+    patientType: 'Neighbor',
+    symptoms: ['High Fever (>102°F)', 'Severe Joint Aches'],
+    landmark: 'Mirpur Section 10 Circle',
+    comments: 'Heavy mosquito breeding near waterlogged underpass.',
+    timestamp: 'Yesterday 4:20 PM',
+  },
+  {
+    id: 'rep-104',
+    areaId: 'jatrabari-sayedabad',
+    areaName: 'Jatrabari & Sayedabad',
+    date: '2026-07-21',
+    patientType: 'Family member',
+    symptoms: ['High Fever (>102°F)', 'Bleeding Gums', 'Retro-orbital Pain'],
+    landmark: 'Sayedabad Bus Terminal Gate 2',
+    comments: 'Tested NS1 positive at local diagnostic center.',
+    timestamp: 'Yesterday 6:05 PM',
+  },
+];
+
+export const INITIAL_SENT_ALERTS: SentAlertLog[] = [
+  {
+    id: 'alert-001',
+    areaId: 'old-dhaka',
+    areaName: 'Old Dhaka (Kotwali & Lalbagh)',
+    riskScore: 94,
+    riskLevel: 'critical',
+    channel: 'SMS',
+    message: '⚠️ GOVT DENGUE ALERT [DGHS/DDRM]: High dengue risk alert in Old Dhaka — residents advised to remove standing water from flowerpots & drums, and use mosquito nets.',
+    recipientCount: 88500,
+    timestamp: '09:00 AM today',
+  },
+  {
+    id: 'alert-002',
+    areaId: 'jatrabari-sayedabad',
+    areaName: 'Jatrabari & Sayedabad',
+    riskScore: 81,
+    riskLevel: 'critical',
+    channel: 'SMS',
+    message: '⚠️ GOVT DENGUE ALERT [DGHS/DDRM]: High dengue risk alert in Jatrabari & Sayedabad — inspect water storage drums & tire yards immediately.',
+    recipientCount: 64200,
+    timestamp: '09:30 AM today',
+  },
+  {
+    id: 'alert-003',
+    areaId: 'mohammadpur',
+    areaName: 'Mohammadpur',
+    riskScore: 78,
+    riskLevel: 'high',
+    channel: 'Emergency Push',
+    message: '⚠️ HIGH RISK ALERT: Mohammadpur dengue score elevated to 78/100. Community vector cleanup recommended.',
+    recipientCount: 52000,
+    timestamp: '11:00 AM today',
   },
 ];

@@ -26,9 +26,15 @@ import {
 
 interface AreaDetailPanelProps {
   area: ComputedAreaRisk | null;
+  onOpenSmsAlert?: (areaId: string) => void;
+  onOpenReportCase?: (areaId: string) => void;
 }
 
-export const AreaDetailPanel: React.FC<AreaDetailPanelProps> = ({ area }) => {
+export const AreaDetailPanel: React.FC<AreaDetailPanelProps> = ({
+  area,
+  onOpenSmsAlert,
+  onOpenReportCase,
+}) => {
   if (!area) {
     return (
       <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 text-center text-slate-400 flex flex-col items-center justify-center h-full min-h-[450px]">
@@ -42,6 +48,14 @@ export const AreaDetailPanel: React.FC<AreaDetailPanelProps> = ({ area }) => {
   }
 
   const badge = getRiskBadgeColor(area.riskLevel);
+
+  // Hospital Capacity calculations
+  const capacityStatusBadge =
+    area.capacityStatus === 'overcapacity'
+      ? { label: '🔴 Overcapacity (Bed Shortage)', bg: 'bg-red-500/20 text-red-300 border-red-500/40' }
+      : area.capacityStatus === 'strained'
+      ? { label: '🟠 Strained Capacity (≥80% Full)', bg: 'bg-amber-500/20 text-amber-300 border-amber-500/40' }
+      : { label: '🟢 Adequate Capacity (<80% Occupied)', bg: 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40' };
 
   return (
     <div className="bg-slate-900 border border-slate-800 rounded-2xl p-4 sm:p-5 shadow-2xl space-y-5 overflow-y-auto max-h-[800px]">
@@ -76,6 +90,102 @@ export const AreaDetailPanel: React.FC<AreaDetailPanelProps> = ({ area }) => {
           <div className={`text-xs font-bold mt-0.5 ${badge.text}`}>
             {area.riskLevel.toUpperCase()} RISK
           </div>
+        </div>
+      </div>
+
+      {/* Quick Action Bar for Area */}
+      <div className="flex items-center gap-2 flex-wrap">
+        {onOpenSmsAlert && (
+          <button
+            onClick={() => onOpenSmsAlert(area.id)}
+            className="flex-1 py-2 px-3 bg-red-600/20 hover:bg-red-600/30 text-red-300 border border-red-500/40 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5"
+          >
+            <ShieldAlert className="w-3.5 h-3.5" />
+            <span>Simulate SMS Alert</span>
+          </button>
+        )}
+        {onOpenReportCase && (
+          <button
+            onClick={() => onOpenReportCase(area.id)}
+            className="flex-1 py-2 px-3 bg-purple-600/20 hover:bg-purple-600/30 text-purple-300 border border-purple-500/40 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5"
+          >
+            <Users className="w-3.5 h-3.5" />
+            <span>Report Case Here</span>
+          </button>
+        )}
+      </div>
+
+      {/* Hospital Capacity Overlay (Resource Allocation Angle) */}
+      <div className="bg-slate-950/90 border border-slate-800 rounded-xl p-4 space-y-3">
+        <div className="flex items-center justify-between">
+          <h3 className="text-xs font-bold text-slate-200 uppercase tracking-wider flex items-center gap-1.5">
+            <Hospital className="w-4 h-4 text-rose-400" />
+            Hospital Bed Capacity vs Patient Load
+          </h3>
+          <span className={`px-2.5 py-0.5 rounded-full text-[11px] font-bold border ${capacityStatusBadge.bg}`}>
+            {capacityStatusBadge.label}
+          </span>
+        </div>
+
+        {/* Visual Callout Bar */}
+        <div className="bg-slate-900 p-3 rounded-xl border border-slate-800 text-xs space-y-2">
+          <div className="grid grid-cols-3 gap-2 text-center">
+            <div className="p-2 bg-slate-950 rounded-lg border border-slate-800">
+              <span className="text-[10px] text-slate-400 block uppercase">Dengue Patients</span>
+              <span className="text-base font-extrabold text-red-400">{area.currentPatients.toLocaleString()}</span>
+            </div>
+            <div className="p-2 bg-slate-950 rounded-lg border border-slate-800">
+              <span className="text-[10px] text-slate-400 block uppercase">Hospital Beds</span>
+              <span className="text-base font-extrabold text-blue-400">{area.hospitalBeds.toLocaleString()}</span>
+            </div>
+            <div className={`p-2 rounded-lg border ${area.capacityGap > 0 ? 'bg-red-500/10 border-red-500/30 text-red-300' : 'bg-emerald-500/10 border-emerald-500/30 text-emerald-300'}`}>
+              <span className="text-[10px] block uppercase">Capacity Gap</span>
+              <span className="text-base font-extrabold">
+                {area.capacityGap > 0 ? `+${area.capacityGap} Shortage` : `${Math.abs(area.capacityGap)} Available`}
+              </span>
+            </div>
+          </div>
+
+          {/* Progress bar comparison */}
+          <div>
+            <div className="flex justify-between text-[11px] text-slate-400 mb-1">
+              <span>Occupancy Ratio: {((area.currentPatients / area.hospitalBeds) * 100).toFixed(0)}%</span>
+              <span className="font-mono">{area.currentPatients} / {area.hospitalBeds} beds</span>
+            </div>
+            <div className="w-full h-3 bg-slate-800 rounded-full overflow-hidden relative">
+              <div
+                className={`h-full rounded-full transition-all duration-500 ${
+                  area.capacityStatus === 'overcapacity'
+                    ? 'bg-gradient-to-r from-amber-500 to-red-600'
+                    : area.capacityStatus === 'strained'
+                    ? 'bg-amber-500'
+                    : 'bg-emerald-500'
+                }`}
+                style={{ width: `${Math.min(100, (area.currentPatients / area.hospitalBeds) * 100)}%` }}
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Clinical vs Crowdsourced Data Distinction */}
+      <div className="grid grid-cols-2 gap-3">
+        <div className="bg-slate-950/80 border border-blue-500/30 p-3 rounded-xl">
+          <div className="text-[10px] text-blue-400 font-bold uppercase tracking-wider mb-1 flex items-center justify-between">
+            <span>Official DGHS Data</span>
+            <span className="text-[9px] bg-blue-500/20 px-1.5 py-0.5 rounded text-blue-300">Verified</span>
+          </div>
+          <div className="text-xl font-bold text-white">{area.recentCases30d} <span className="text-xs text-slate-400 font-normal">cases (30d)</span></div>
+          <p className="text-[10px] text-slate-500 mt-0.5">Clinical laboratory & hospital admissions</p>
+        </div>
+
+        <div className="bg-slate-950/80 border border-purple-500/30 p-3 rounded-xl">
+          <div className="text-[10px] text-purple-400 font-bold uppercase tracking-wider mb-1 flex items-center justify-between">
+            <span>Community Reported</span>
+            <span className="text-[9px] bg-purple-500/20 px-1.5 py-0.5 rounded text-purple-300">Unverified</span>
+          </div>
+          <div className="text-xl font-bold text-white">{area.crowdsourcedReports} <span className="text-xs text-slate-400 font-normal">reports</span></div>
+          <p className="text-[10px] text-slate-500 mt-0.5">Public self-reports & neighborhood signals</p>
         </div>
       </div>
 

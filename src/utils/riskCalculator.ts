@@ -78,11 +78,30 @@ export function calculateAreaRisks(
       riskLevel = 'low';
     }
 
+    // Capacity status
+    const hospitalBeds = area.hospitalBeds || 100;
+    const currentPatients = Math.round((area.currentPatients || adj.cases) * modifiers.caseMultiplier);
+    const capacityGap = currentPatients - hospitalBeds;
+    const occupancyRatio = currentPatients / hospitalBeds;
+    let capacityStatus: 'adequate' | 'strained' | 'overcapacity' = 'adequate';
+    if (occupancyRatio > 1.0) {
+      capacityStatus = 'overcapacity';
+    } else if (occupancyRatio >= 0.80) {
+      capacityStatus = 'strained';
+    } else {
+      capacityStatus = 'adequate';
+    }
+
     return {
       ...area,
       recentCases30d: adj.cases,
       recentRainfallMm: adj.rainfall,
       populationDensity: adj.density,
+      hospitalBeds,
+      currentPatients,
+      crowdsourcedReports: area.crowdsourcedReports || 0,
+      capacityGap,
+      capacityStatus,
       normalized: {
         normCases,
         normRainfall,

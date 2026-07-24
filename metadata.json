@@ -1,5 +1,5 @@
 {
-  "name": "Dhaka Dengue Risk Map",
+  "name": "DDRM - Dhaka Dengue Risk Map",
   "description": "An early-warning epidemic intelligence dashboard predicting dengue outbreak risk by area in Dhaka, Bangladesh for university research and poster competition.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
