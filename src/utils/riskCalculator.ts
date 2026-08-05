@@ -190,7 +190,7 @@ export function getRiskBadgeColor(level: RiskLevel) {
         text: 'text-red-400 font-extrabold',
         border: 'border-red-500/80',
         fill: '#dc2626',
-        glow: 'shadow-[0_0_20px_rgba(220,38,38,0.7)]',
+        glow: '',
         label: 'Critical Threat (>0.80)',
       };
     case 'high':
@@ -199,7 +199,7 @@ export function getRiskBadgeColor(level: RiskLevel) {
         text: 'text-rose-400',
         border: 'border-rose-500/40',
         fill: '#f43f5e',
-        glow: 'shadow-[0_0_15px_rgba(244,63,94,0.4)]',
+        glow: '',
         label: 'High Risk (60-79)',
       };
     case 'moderate':
@@ -208,7 +208,7 @@ export function getRiskBadgeColor(level: RiskLevel) {
         text: 'text-amber-400',
         border: 'border-amber-500/40',
         fill: '#f59e0b',
-        glow: 'shadow-[0_0_15px_rgba(245,158,11,0.3)]',
+        glow: '',
         label: 'Moderate Risk (35-59)',
       };
     case 'low':
@@ -217,7 +217,7 @@ export function getRiskBadgeColor(level: RiskLevel) {
         text: 'text-emerald-400',
         border: 'border-emerald-500/40',
         fill: '#10b981',
-        glow: 'shadow-[0_0_15px_rgba(16,185,129,0.2)]',
+        glow: '',
         label: 'Low Risk (<35)',
       };
   }

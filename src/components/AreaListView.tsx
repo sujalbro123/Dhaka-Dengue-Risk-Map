@@ -71,7 +71,7 @@ export const AreaListView: React.FC<AreaListViewProps> = ({
             placeholder="Search Thana or Ward..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-9 pr-3 py-1.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-slate-600"
+            className="w-full pl-9 pr-3 py-1.5 bg-slate-950 border border-slate-800 rounded-sm text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-slate-600"
           />
         </div>
 
@@ -79,7 +79,7 @@ export const AreaListView: React.FC<AreaListViewProps> = ({
         <div className="flex items-center gap-1.5">
           <button
             onClick={() => setFilterRisk('all')}
-            className={`px-2.5 py-1 rounded-lg text-xs font-semibold transition-colors ${
+            className={`px-2.5 py-1 rounded-sm text-xs font-semibold transition-colors ${
               filterRisk === 'all'
                 ? 'bg-slate-700 text-white'
                 : 'bg-slate-900 text-slate-400 hover:text-slate-200'
@@ -89,7 +89,7 @@ export const AreaListView: React.FC<AreaListViewProps> = ({
           </button>
           <button
             onClick={() => setFilterRisk('high')}
-            className={`px-2.5 py-1 rounded-lg text-xs font-semibold transition-colors ${
+            className={`px-2.5 py-1 rounded-sm text-xs font-semibold transition-colors ${
               filterRisk === 'high'
                 ? 'bg-red-500/20 text-red-300 border border-red-500/40'
                 : 'bg-slate-900 text-slate-400 hover:text-red-400'
@@ -99,7 +99,7 @@ export const AreaListView: React.FC<AreaListViewProps> = ({
           </button>
           <button
             onClick={() => setFilterRisk('moderate')}
-            className={`px-2.5 py-1 rounded-lg text-xs font-semibold transition-colors ${
+            className={`px-2.5 py-1 rounded-sm text-xs font-semibold transition-colors ${
               filterRisk === 'moderate'
                 ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40'
                 : 'bg-slate-900 text-slate-400 hover:text-amber-400'
@@ -109,7 +109,7 @@ export const AreaListView: React.FC<AreaListViewProps> = ({
           </button>
           <button
             onClick={() => setFilterRisk('low')}
-            className={`px-2.5 py-1 rounded-lg text-xs font-semibold transition-colors ${
+            className={`px-2.5 py-1 rounded-sm text-xs font-semibold transition-colors ${
               filterRisk === 'low'
                 ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40'
                 : 'bg-slate-900 text-slate-400 hover:text-emerald-400'
@@ -131,10 +131,10 @@ export const AreaListView: React.FC<AreaListViewProps> = ({
               <div
                 key={area.id}
                 onClick={() => onSelectArea(area)}
-                className={`p-3.5 rounded-xl border transition-all cursor-pointer relative overflow-hidden ${
+                className={`p-3.5 rounded-sm border transition-colors cursor-pointer relative overflow-hidden ${
                   isSelected
-                    ? 'bg-slate-800 border-emerald-500/80 shadow-lg ring-1 ring-emerald-500/50'
-                    : 'bg-slate-950/80 border-slate-800 hover:bg-slate-800/60 hover:border-slate-700'
+                    ? 'bg-slate-800 border-white'
+                    : 'bg-slate-950 border-slate-800 hover:bg-slate-800/60 hover:border-slate-700'
                 }`}
               >
                 {/* Risk Level Accent Stripe */}
@@ -156,7 +156,7 @@ export const AreaListView: React.FC<AreaListViewProps> = ({
                     </div>
 
                     <div
-                      className={`px-2 py-0.5 rounded-md text-[11px] font-bold border flex items-center gap-1 ${badge.bg} ${badge.text} ${badge.border}`}
+                      className={`px-2 py-0.5 rounded-sm text-[11px] font-bold border flex items-center gap-1 font-mono ${badge.bg} ${badge.text} ${badge.border}`}
                     >
                       <span>{area.riskScore100} / 100</span>
                       {/* Trend Arrow (Requirement D) */}
@@ -176,10 +176,10 @@ export const AreaListView: React.FC<AreaListViewProps> = ({
                   </div>
 
                   {/* Year-over-Year comparison pill */}
-                  <div className="text-[10px] text-slate-300 font-medium bg-slate-900/90 px-2 py-1 rounded-md border border-slate-800 flex items-center justify-between mt-1">
-                    <span className="text-slate-400">vs 2025:</span>
+                  <div className="text-[10px] text-slate-300 font-medium bg-slate-900 px-2 py-1 rounded-sm border border-slate-800 flex items-center justify-between mt-1">
+                    <span className="text-slate-400 font-sans">vs 2025:</span>
                     <span
-                      className={`font-bold ${
+                      className={`font-bold font-mono ${
                         area.yearOverYearChangePercent > 0
                           ? 'text-red-400'
                           : area.yearOverYearChangePercent < 0
@@ -197,23 +197,23 @@ export const AreaListView: React.FC<AreaListViewProps> = ({
                   <div className="grid grid-cols-3 gap-2 mt-3 pt-2.5 border-t border-slate-800/80 text-center">
                     <div>
                       <div className="text-[10px] text-slate-400 font-medium">Cases</div>
-                      <div className="text-xs font-bold text-slate-200 mt-0.5">{area.recentCases30d}</div>
+                      <div className="text-xs font-bold text-slate-200 mt-0.5 font-mono">{area.recentCases30d}</div>
                     </div>
 
                     <div>
                       <div className="text-[10px] text-slate-400 font-medium">Rainfall</div>
-                      <div className="text-xs font-bold text-cyan-400 mt-0.5">{area.recentRainfallMm} mm</div>
+                      <div className="text-xs font-bold text-cyan-400 mt-0.5 font-mono">{area.recentRainfallMm} mm</div>
                     </div>
 
                     <div>
                       <div className="text-[10px] text-slate-400 font-medium">Density</div>
-                      <div className="text-xs font-bold text-slate-300 mt-0.5">
+                      <div className="text-xs font-bold text-slate-300 mt-0.5 font-mono">
                         {Math.round(area.populationDensity / 1000)}k/km²
                       </div>
                     </div>
                   </div>
 
-                  <div className="flex justify-end items-center mt-2 text-[11px] font-semibold text-emerald-400">
+                  <div className="flex justify-end items-center mt-2 text-[11px] font-semibold text-slate-300">
                     <span>Inspect details</span>
                     <ChevronRight className="w-3.5 h-3.5 ml-0.5" />
                   </div>
@@ -226,7 +226,7 @@ export const AreaListView: React.FC<AreaListViewProps> = ({
 
       {/* Table View Mode */}
       {viewMode === 'table' && (
-        <div className="overflow-x-auto overflow-y-auto max-h-[500px] border border-slate-800 rounded-xl">
+        <div className="overflow-x-auto overflow-y-auto max-h-[500px] border border-slate-800 rounded-sm">
           <table className="w-full text-left border-collapse text-xs">
             <thead className="bg-slate-950 text-slate-400 sticky top-0 border-b border-slate-800 uppercase text-[10px] font-bold tracking-wider">
               <tr>
@@ -272,7 +272,7 @@ export const AreaListView: React.FC<AreaListViewProps> = ({
                     key={area.id}
                     onClick={() => onSelectArea(area)}
                     className={`cursor-pointer transition-colors ${
-                      isSelected ? 'bg-slate-800/90' : 'hover:bg-slate-800/40'
+                      isSelected ? 'bg-slate-800' : 'hover:bg-slate-800/40'
                     }`}
                   >
                     <td className="p-3 font-bold text-white">
@@ -282,12 +282,12 @@ export const AreaListView: React.FC<AreaListViewProps> = ({
                     <td className="p-3 text-slate-300 font-medium">{area.corporation}</td>
                     <td className="p-3">
                       <span
-                        className={`inline-flex items-center px-2 py-0.5 rounded-full font-bold text-xs ${badge.bg} ${badge.text}`}
+                        className={`inline-flex items-center px-2 py-0.5 rounded-sm font-bold text-xs font-mono ${badge.bg} ${badge.text}`}
                       >
                         {area.riskScore100} / 100 ({area.riskLevel.toUpperCase()})
                       </span>
                     </td>
-                    <td className="p-3 font-bold text-sm">
+                    <td className="p-3 font-bold text-sm font-mono">
                       <span
                         className={
                           area.trend === 'rising'
@@ -300,7 +300,7 @@ export const AreaListView: React.FC<AreaListViewProps> = ({
                         {area.trend === 'rising' ? '↑ Rising' : area.trend === 'falling' ? '↓ Falling' : '→ Stable'}
                       </span>
                     </td>
-                    <td className="p-3 font-semibold">
+                    <td className="p-3 font-semibold font-mono">
                       <span
                         className={
                           area.yearOverYearChangePercent > 0
@@ -314,14 +314,14 @@ export const AreaListView: React.FC<AreaListViewProps> = ({
                           ? `+${area.yearOverYearChangePercent}%`
                           : `${area.yearOverYearChangePercent}%`}
                       </span>
-                      <span className="text-[10px] text-slate-500 block">(2025: {area.priorYearRiskScore})</span>
+                      <span className="text-[10px] text-slate-500 block font-sans">(2025: {area.priorYearRiskScore})</span>
                     </td>
-                    <td className="p-3 font-semibold text-slate-200">{area.recentCases30d}</td>
-                    <td className="p-3 font-semibold text-cyan-400">{area.recentRainfallMm} mm</td>
-                    <td className="p-3 text-slate-300">{area.populationDensity.toLocaleString()} /km²</td>
+                    <td className="p-3 font-semibold text-slate-200 font-mono">{area.recentCases30d}</td>
+                    <td className="p-3 font-semibold text-cyan-400 font-mono">{area.recentRainfallMm} mm</td>
+                    <td className="p-3 text-slate-300 font-mono">{area.populationDensity.toLocaleString()} /km²</td>
                     <td className="p-3 font-mono font-bold text-amber-400">{area.breteauIndex}</td>
                     <td className="p-3 text-right">
-                      <button className="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-md text-[11px] font-semibold border border-slate-700">
+                      <button className="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-sm text-[11px] font-semibold border border-slate-700">
                         View
                       </button>
                     </td>

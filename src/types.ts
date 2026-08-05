@@ -34,6 +34,10 @@ export interface DhakaArea {
   crowdsourcedReports: number; // Community unverified case count
   coordinates: { x: number; y: number }; // Center coordinate on custom SVG map
   svgPath: string; // Vector polygon path for map
+  windDirectionDegrees?: number; // e.g. 210 (SSW)
+  windDirectionCardinal?: string; // e.g. 'SSW'
+  windSpeedKmH?: number; // e.g. 18 km/h
+  temperatureC?: number; // e.g. 32.5°C
 }
 
 export interface NormalizedFactors {

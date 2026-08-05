@@ -40,6 +40,10 @@ export const INITIAL_DHAKA_AREAS: DhakaArea[] = [
     coordinates: { x: 260, y: 190 },
     // Stylized SVG polygon path for Mirpur (North-West)
     svgPath: 'M 190,130 L 320,110 L 330,220 L 250,260 L 170,220 Z',
+    windDirectionDegrees: 210,
+    windDirectionCardinal: 'SSW',
+    windSpeedKmH: 18,
+    temperatureC: 32.8,
   },
   {
     id: 'uttara',
@@ -79,6 +83,10 @@ export const INITIAL_DHAKA_AREAS: DhakaArea[] = [
     coordinates: { x: 370, y: 90 },
     // Uttara (Far North)
     svgPath: 'M 300,30 L 450,20 L 460,110 L 320,110 Z',
+    windDirectionDegrees: 195,
+    windDirectionCardinal: 'SSW',
+    windSpeedKmH: 22,
+    temperatureC: 30.2,
   },
   {
     id: 'gulshan-banani',
@@ -117,6 +125,10 @@ export const INITIAL_DHAKA_AREAS: DhakaArea[] = [
     coordinates: { x: 410, y: 190 },
     // Gulshan/Banani (North East)
     svgPath: 'M 330,110 L 470,110 L 460,220 L 330,220 Z',
+    windDirectionDegrees: 220,
+    windDirectionCardinal: 'SW',
+    windSpeedKmH: 15,
+    temperatureC: 31.5,
   },
   {
     id: 'dhanmondi',
@@ -156,6 +168,10 @@ export const INITIAL_DHAKA_AREAS: DhakaArea[] = [
     coordinates: { x: 280, y: 310 },
     // Dhanmondi (Central West)
     svgPath: 'M 250,260 L 330,250 L 320,350 L 230,350 Z',
+    windDirectionDegrees: 205,
+    windDirectionCardinal: 'SSW',
+    windSpeedKmH: 14,
+    temperatureC: 33.2,
   },
   {
     id: 'mohammadpur',
@@ -195,6 +211,10 @@ export const INITIAL_DHAKA_AREAS: DhakaArea[] = [
     coordinates: { x: 200, y: 300 },
     // Mohammadpur (West)
     svgPath: 'M 140,230 L 250,260 L 230,350 L 130,320 Z',
+    windDirectionDegrees: 215,
+    windDirectionCardinal: 'SW',
+    windSpeedKmH: 17,
+    temperatureC: 32.5,
   },
   {
     id: 'old-dhaka',
@@ -234,6 +254,10 @@ export const INITIAL_DHAKA_AREAS: DhakaArea[] = [
     coordinates: { x: 280, y: 440 },
     // Old Dhaka (South)
     svgPath: 'M 200,400 L 340,390 L 350,510 L 200,500 Z',
+    windDirectionDegrees: 190,
+    windDirectionCardinal: 'S',
+    windSpeedKmH: 11,
+    temperatureC: 33.5,
   },
   {
     id: 'badda-rampura',
@@ -273,6 +297,10 @@ export const INITIAL_DHAKA_AREAS: DhakaArea[] = [
     coordinates: { x: 420, y: 270 },
     // Badda & Rampura (East)
     svgPath: 'M 330,220 L 480,220 L 490,320 L 330,310 Z',
+    windDirectionDegrees: 225,
+    windDirectionCardinal: 'SW',
+    windSpeedKmH: 19,
+    temperatureC: 31.8,
   },
   {
     id: 'motijheel-paltan',
@@ -311,6 +339,10 @@ export const INITIAL_DHAKA_AREAS: DhakaArea[] = [
     coordinates: { x: 370, y: 350 },
     // Motijheel/Paltan (Central South)
     svgPath: 'M 320,310 L 410,310 L 410,390 L 330,390 Z',
+    windDirectionDegrees: 200,
+    windDirectionCardinal: 'SSW',
+    windSpeedKmH: 12,
+    temperatureC: 34.1,
   },
   {
     id: 'jatrabari-sayedabad',
@@ -350,6 +382,10 @@ export const INITIAL_DHAKA_AREAS: DhakaArea[] = [
     coordinates: { x: 420, y: 440 },
     // Jatrabari (South East)
     svgPath: 'M 380,390 L 510,380 L 520,500 L 350,510 Z',
+    windDirectionDegrees: 180,
+    windDirectionCardinal: 'S',
+    windSpeedKmH: 16,
+    temperatureC: 32.9,
   },
   {
     id: 'khilgaon-basabo',
@@ -388,6 +424,10 @@ export const INITIAL_DHAKA_AREAS: DhakaArea[] = [
     coordinates: { x: 440, y: 340 },
     // Khilgaon (East Central)
     svgPath: 'M 410,310 L 510,320 L 500,380 L 410,390 Z',
+    windDirectionDegrees: 210,
+    windDirectionCardinal: 'SSW',
+    windSpeedKmH: 17,
+    temperatureC: 32.2,
   },
   {
     id: 'tejgaon',
@@ -426,6 +466,10 @@ export const INITIAL_DHAKA_AREAS: DhakaArea[] = [
     coordinates: { x: 330, y: 220 },
     // Tejgaon (Center)
     svgPath: 'M 280,180 L 360,180 L 350,260 L 260,250 Z',
+    windDirectionDegrees: 210,
+    windDirectionCardinal: 'SSW',
+    windSpeedKmH: 16,
+    temperatureC: 33.8,
   },
   {
     id: 'cantonment-kafrul',
@@ -464,6 +508,10 @@ export const INITIAL_DHAKA_AREAS: DhakaArea[] = [
     coordinates: { x: 310, y: 140 },
     // Cantonment (North Center)
     svgPath: 'M 260,110 L 340,110 L 330,180 L 250,180 Z',
+    windDirectionDegrees: 200,
+    windDirectionCardinal: 'SSW',
+    windSpeedKmH: 20,
+    temperatureC: 30.8,
   },
 ];
 

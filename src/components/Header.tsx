@@ -34,21 +34,20 @@ export const Header: React.FC<HeaderProps> = ({
   sentAlertsCount,
 }) => {
   return (
-    <header className="bg-slate-900 border-b border-slate-800 text-slate-100 sticky top-0 z-30 shadow-lg">
+    <header className="bg-slate-900 border-b border-[#E3E1DA]/20 text-slate-100 sticky top-0 z-30">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
           {/* Brand Title */}
           <div className="flex items-center space-x-3">
-            <div className="p-2.5 bg-red-500/20 border border-red-500/40 rounded-xl text-red-400 shrink-0 shadow-[0_0_15px_rgba(239,68,68,0.2)]">
-              <ShieldAlert className="w-6 h-6 animate-pulse" />
+            <div className="p-2 bg-red-950/40 border border-red-500/40 rounded text-red-400 shrink-0">
+              <ShieldAlert className="w-5 h-5 text-red-400" />
             </div>
             <div>
               <div className="flex items-center gap-2 flex-wrap">
                 <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-white flex items-center gap-2">
                   DDRM — Dhaka Dengue Risk Map
                 </h1>
-                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
-                  <GraduationCap className="w-3.5 h-3.5 mr-1" />
+                <span className="text-slate-400 text-xs font-semibold uppercase tracking-wider">
                   Research Poster Demo
                 </span>
               </div>
@@ -63,12 +62,12 @@ export const Header: React.FC<HeaderProps> = ({
             {/* Simulate SMS Alert Button */}
             <button
               onClick={onOpenSmsAlert}
-              className="flex items-center gap-1.5 px-3 py-1.5 bg-red-600/20 hover:bg-red-600/30 text-red-300 border border-red-500/40 rounded-lg text-xs font-bold transition-all"
+              className="flex items-center gap-1.5 px-3 py-1.5 bg-[#1F3A5F] hover:bg-[#152843] text-white border border-[#E3E1DA]/30 rounded-sm text-xs font-semibold transition-colors"
             >
-              <BellRing className="w-3.5 h-3.5 text-red-400" />
+              <BellRing className="w-4 h-4 text-white" />
               <span>Simulate SMS Alert</span>
               {sentAlertsCount > 0 && (
-                <span className="px-1.5 py-0.2 bg-red-500 text-white rounded-full text-[10px]">
+                <span className="px-1.5 py-0.2 bg-red-600 text-white rounded-sm text-[10px]">
                   {sentAlertsCount}
                 </span>
               )}
@@ -77,14 +76,14 @@ export const Header: React.FC<HeaderProps> = ({
             {/* Report Suspected Case Button */}
             <button
               onClick={onOpenReportCase}
-              className="flex items-center gap-1.5 px-3 py-1.5 bg-purple-600/20 hover:bg-purple-600/30 text-purple-300 border border-purple-500/40 rounded-lg text-xs font-bold transition-all"
+              className="flex items-center gap-1.5 px-3 py-1.5 bg-[#1F3A5F] hover:bg-[#152843] text-white border border-[#E3E1DA]/30 rounded-sm text-xs font-semibold transition-colors"
             >
-              <UserPlus className="w-3.5 h-3.5 text-purple-400" />
+              <UserPlus className="w-4 h-4 text-white" />
               <span>Report Case</span>
             </button>
 
             {/* Scenario Selector */}
-            <div className="relative flex items-center bg-slate-800 border border-slate-700 rounded-lg px-2.5 py-1 text-xs text-slate-300">
+            <div className="relative flex items-center bg-slate-800 border border-slate-700 rounded-sm px-2.5 py-1 text-xs text-slate-300">
               <span className="text-slate-400 mr-2 font-medium hidden sm:inline">Scenario:</span>
               <select
                 value={selectedScenarioId}
@@ -102,31 +101,31 @@ export const Header: React.FC<HeaderProps> = ({
             {/* Simulation Slider Toggle */}
             <button
               onClick={onToggleSimControls}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-sm text-xs font-medium transition-colors ${
                 isSimControlsOpen
-                  ? 'bg-amber-500 text-slate-950 font-semibold shadow-md'
+                  ? 'bg-amber-600 text-white font-semibold border border-amber-500'
                   : 'bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700'
               }`}
             >
-              <SlidersHorizontal className="w-3.5 h-3.5" />
+              <SlidersHorizontal className="w-3.5 h-3.5 text-slate-200" />
               <span>Simulate</span>
             </button>
 
             {/* CSV Data Import / Export */}
             <button
               onClick={onOpenCsvModal}
-              className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 rounded-lg text-xs font-medium transition-all"
+              className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 rounded-sm text-xs font-medium transition-colors"
             >
-              <FileSpreadsheet className="w-3.5 h-3.5 text-blue-400" />
+              <FileSpreadsheet className="w-3.5 h-3.5 text-slate-300" />
               <span>CSV Data</span>
             </button>
 
             {/* How Formula Works Modal */}
             <button
               onClick={onOpenHowItWorks}
-              className="flex items-center gap-1.5 px-3 py-1.5 bg-indigo-600/30 hover:bg-indigo-600/50 text-indigo-200 border border-indigo-500/40 rounded-lg text-xs font-semibold transition-all"
+              className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 rounded-sm text-xs font-semibold transition-colors"
             >
-              <Info className="w-3.5 h-3.5 text-indigo-400" />
+              <Info className="w-3.5 h-3.5 text-slate-300" />
               <span>How This Works</span>
             </button>
           </div>

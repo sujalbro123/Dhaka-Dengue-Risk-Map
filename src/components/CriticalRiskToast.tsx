@@ -42,16 +42,16 @@ export const CriticalRiskToast: React.FC<CriticalRiskToastProps> = ({
   if (!isVisible || criticalAreas.length === 0) return null;
 
   return (
-    <div className="fixed bottom-5 right-5 z-50 max-w-md w-full px-4 sm:px-0 animate-in fade-in slide-in-from-bottom-6 duration-300">
-      <div className="bg-[#0f1218] border-2 border-red-500/80 rounded-2xl shadow-[0_0_40px_rgba(239,68,68,0.35)] overflow-hidden">
-        {/* Top Emergency Pulse Header */}
-        <div className="bg-gradient-to-r from-red-600 via-red-500 to-amber-600 p-3 flex items-center justify-between text-white">
+    <div className="fixed bottom-5 right-5 z-50 max-w-md w-full px-4 sm:px-0">
+      <div className="bg-[#0f1218] border border-red-700 rounded-sm overflow-hidden">
+        {/* Top Emergency Header */}
+        <div className="bg-red-900/90 border-b border-red-700 p-3 flex items-center justify-between text-white">
           <div className="flex items-center gap-2">
-            <div className="p-1.5 bg-black/30 rounded-lg animate-pulse">
-              <Siren className="w-5 h-5 text-yellow-300" />
+            <div className="p-1.5 bg-black/40 rounded-sm">
+              <Siren className="w-4 h-4 text-red-200" />
             </div>
             <div>
-              <div className="text-[10px] font-extrabold uppercase tracking-[0.2em] text-red-100">
+              <div className="text-[10px] font-extrabold uppercase tracking-[0.2em] text-red-200">
                 Simulation Alert
               </div>
               <h4 className="text-xs sm:text-sm font-black tracking-tight flex items-center gap-1.5">
@@ -64,16 +64,16 @@ export const CriticalRiskToast: React.FC<CriticalRiskToastProps> = ({
             <button
               onClick={() => setIsMuted(!isMuted)}
               title={isMuted ? 'Unmute Audio Warning' : 'Mute Audio Warning'}
-              className="p-1 hover:bg-black/20 rounded-md transition-colors text-red-100"
+              className="p-1 hover:bg-black/20 rounded-sm transition-colors text-red-100"
             >
               {isMuted ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
             </button>
             <button
               onClick={onDismiss}
               title="Dismiss Alert"
-              className="p-1 hover:bg-black/20 rounded-md transition-colors text-red-100"
+              className="p-1 hover:bg-black/20 rounded-sm transition-colors text-red-100"
             >
-              <X className="w-5 h-5" />
+              <X className="w-4 h-4" />
             </button>
           </div>
         </div>
@@ -93,22 +93,22 @@ export const CriticalRiskToast: React.FC<CriticalRiskToastProps> = ({
                 onClick={() => {
                   onSelectArea(area.id);
                 }}
-                className="p-2.5 bg-[#1a1f26] border border-red-500/40 hover:border-red-400 rounded-xl flex items-center justify-between gap-2 cursor-pointer transition-all hover:bg-slate-800/80 group"
+                className="p-2.5 bg-[#1a1f26] border border-red-500/40 hover:border-red-400 rounded-sm flex items-center justify-between gap-2 cursor-pointer transition-colors hover:bg-slate-800/80 group"
               >
                 <div className="flex items-center gap-2 min-w-0">
-                  <div className="w-2 h-2 rounded-full bg-red-500 animate-ping shrink-0" />
+                  <div className="w-2 h-2 rounded-sm bg-red-500 shrink-0" />
                   <div className="truncate">
                     <div className="font-bold text-xs text-white group-hover:text-red-300 transition-colors">
                       {area.name} <span className="text-[11px] text-slate-400 font-normal">({area.corporation})</span>
                     </div>
-                    <div className="text-[10px] text-slate-400">
+                    <div className="text-[10px] text-slate-400 font-mono">
                       {area.recentCases30d} cases • {area.recentRainfallMm}mm rain
                     </div>
                   </div>
                 </div>
 
                 <div className="flex items-center gap-2 shrink-0">
-                  <span className="px-2 py-0.5 bg-red-500/20 text-red-400 font-extrabold font-mono text-xs rounded-md border border-red-500/40">
+                  <span className="px-2 py-0.5 bg-red-500/20 text-red-400 font-extrabold font-mono text-xs rounded-sm border border-red-500/40">
                     {area.riskScore100} / 100
                   </span>
                   <ChevronRight className="w-4 h-4 text-slate-400 group-hover:text-white transition-colors" />
@@ -125,7 +125,7 @@ export const CriticalRiskToast: React.FC<CriticalRiskToastProps> = ({
             </span>
             <button
               onClick={onDismiss}
-              className="px-3 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold rounded-lg text-xs transition-colors border border-slate-700"
+              className="px-3 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold rounded-sm text-xs transition-colors border border-slate-700"
             >
               Dismiss
             </button>

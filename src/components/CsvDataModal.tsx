@@ -89,13 +89,13 @@ export const CsvDataModal: React.FC<CsvDataModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md overflow-y-auto">
-      <div className="bg-slate-900 border border-slate-700/80 rounded-2xl max-w-2xl w-full p-5 sm:p-6 shadow-2xl text-slate-100 my-8">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 overflow-y-auto">
+      <div className="bg-slate-900 border border-[#E3E1DA]/20 rounded-sm max-w-2xl w-full p-5 sm:p-6 text-slate-100 my-8">
         {/* Modal Header */}
         <div className="flex items-center justify-between pb-4 border-b border-slate-800">
           <div className="flex items-center gap-2.5">
-            <div className="p-2 bg-blue-500/20 text-blue-400 rounded-xl border border-blue-500/30">
-              <FileSpreadsheet className="w-5 h-5" />
+            <div className="p-1.5 bg-slate-800 text-slate-300 rounded-sm border border-slate-700">
+              <FileSpreadsheet className="w-4 h-4 text-slate-200" />
             </div>
             <div>
               <h2 className="text-lg font-bold text-white">Custom Data Import & CSV Exporter</h2>
@@ -107,20 +107,20 @@ export const CsvDataModal: React.FC<CsvDataModalProps> = ({
 
           <button
             onClick={onClose}
-            className="p-1.5 text-slate-400 hover:text-white bg-slate-800 rounded-lg transition-colors"
+            className="p-1.5 text-slate-400 hover:text-white bg-slate-800 rounded-sm transition-colors border border-slate-700"
           >
-            <X className="w-5 h-5" />
+            <X className="w-4 h-4" />
           </button>
         </div>
 
         <div className="space-y-5 mt-4 text-xs sm:text-sm">
           {/* Format Specification Banner */}
-          <div className="bg-slate-950 p-3.5 rounded-xl border border-slate-800">
+          <div className="bg-slate-950 p-3.5 rounded-sm border border-slate-800">
             <div className="font-semibold text-slate-200 mb-1 flex items-center gap-1.5">
-              <FileText className="w-4 h-4 text-blue-400" />
+              <FileText className="w-4 h-4 text-slate-400" />
               Required CSV Schema Format:
             </div>
-            <code className="block bg-slate-900 p-2 rounded text-[11px] font-mono text-cyan-300 mt-1 overflow-x-auto">
+            <code className="block bg-slate-900 p-2 rounded-sm text-[11px] font-mono text-cyan-300 mt-1 overflow-x-auto">
               area_name, month, case_count, rainfall_mm, population_density
             </code>
             <p className="text-slate-400 text-xs mt-2">
@@ -132,7 +132,7 @@ export const CsvDataModal: React.FC<CsvDataModalProps> = ({
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <button
               onClick={downloadTemplateCSV}
-              className="flex items-center justify-center gap-2 p-3 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 rounded-xl font-semibold text-xs transition-colors"
+              className="flex items-center justify-center gap-2 p-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 rounded-sm font-semibold text-xs transition-colors"
             >
               <Download className="w-4 h-4 text-emerald-400" />
               <span>Download CSV Template</span>
@@ -140,15 +140,15 @@ export const CsvDataModal: React.FC<CsvDataModalProps> = ({
 
             <button
               onClick={() => exportRiskReportCSV(computedAreas)}
-              className="flex items-center justify-center gap-2 p-3 bg-blue-600/30 hover:bg-blue-600/50 text-blue-200 border border-blue-500/40 rounded-xl font-semibold text-xs transition-colors"
+              className="flex items-center justify-center gap-2 p-2.5 bg-[#1F3A5F] hover:bg-[#1a3050] text-white border border-[#E3E1DA]/30 rounded-sm font-semibold text-xs transition-colors"
             >
-              <FileSpreadsheet className="w-4 h-4 text-blue-400" />
+              <FileSpreadsheet className="w-4 h-4 text-blue-300" />
               <span>Export Risk Report CSV</span>
             </button>
           </div>
 
           {/* Upload Box */}
-          <div className="border-2 border-dashed border-slate-700 hover:border-slate-500 rounded-xl p-5 text-center bg-slate-950/50 transition-colors">
+          <div className="border border-dashed border-slate-700 hover:border-slate-500 rounded-sm p-5 text-center bg-slate-950 transition-colors">
             <input
               type="file"
               accept=".csv"
@@ -160,7 +160,7 @@ export const CsvDataModal: React.FC<CsvDataModalProps> = ({
               htmlFor="csv-upload"
               className="cursor-pointer flex flex-col items-center justify-center gap-2 text-slate-300"
             >
-              <Upload className="w-8 h-8 text-blue-400" />
+              <Upload className="w-6 h-6 text-slate-400" />
               <span className="font-semibold text-xs sm:text-sm">
                 Click to browse or drop your DGHS .csv file here
               </span>
@@ -173,7 +173,7 @@ export const CsvDataModal: React.FC<CsvDataModalProps> = ({
           {/* Status Message */}
           {statusMsg && (
             <div
-              className={`p-3 rounded-xl text-xs flex items-center gap-2 ${
+              className={`p-3 rounded-sm text-xs flex items-center gap-2 ${
                 statusMsg.type === 'success'
                   ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
                   : 'bg-red-500/20 text-red-300 border border-red-500/30'
@@ -194,9 +194,9 @@ export const CsvDataModal: React.FC<CsvDataModalProps> = ({
               <div className="font-semibold text-slate-300 text-xs">
                 Parsed Data Preview ({previewRows.length} Areas):
               </div>
-              <div className="max-h-40 overflow-y-auto border border-slate-800 rounded-xl">
-                <table className="w-full text-left text-xs bg-slate-950">
-                  <thead className="border-b border-slate-800 text-slate-400 sticky top-0 bg-slate-900">
+              <div className="max-h-40 overflow-y-auto border border-slate-800 rounded-sm">
+                <table className="w-full text-left text-xs bg-slate-950 font-mono">
+                  <thead className="border-b border-slate-800 text-slate-400 sticky top-0 bg-slate-900 font-sans">
                     <tr>
                       <th className="p-2">Area Name</th>
                       <th className="p-2">30d Cases</th>
@@ -207,7 +207,7 @@ export const CsvDataModal: React.FC<CsvDataModalProps> = ({
                   <tbody className="divide-y divide-slate-800/60">
                     {previewRows.map((row, i) => (
                       <tr key={i} className="text-slate-300">
-                        <td className="p-2 font-bold text-white">{row.name}</td>
+                        <td className="p-2 font-bold text-white font-sans">{row.name}</td>
                         <td className="p-2 text-blue-400 font-semibold">{row.recentCases30d}</td>
                         <td className="p-2 text-cyan-400">{row.recentRainfallMm}</td>
                         <td className="p-2">{row.populationDensity?.toLocaleString()}</td>
@@ -224,14 +224,14 @@ export const CsvDataModal: React.FC<CsvDataModalProps> = ({
         <div className="mt-6 pt-3 border-t border-slate-800 flex justify-end gap-2">
           <button
             onClick={onClose}
-            className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-xs font-semibold"
+            className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-sm text-xs font-semibold border border-slate-700"
           >
             Cancel
           </button>
           {previewRows.length > 0 && (
             <button
               onClick={handleApplyCustomData}
-              className="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-bold transition-colors"
+              className="px-4 py-2 bg-[#1F3A5F] hover:bg-[#1a3050] text-white rounded-sm text-xs font-bold border border-[#E3E1DA]/30 transition-colors"
             >
               Apply to Risk Map
             </button>
