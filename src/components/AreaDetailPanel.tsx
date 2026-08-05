@@ -152,7 +152,7 @@ export const AreaDetailPanel: React.FC<AreaDetailPanelProps> = React.memo(({
         </p>
 
         {/* Comparison Metric Grid */}
-        <div className="grid grid-cols-2 gap-2 text-center text-xs pt-1">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-center text-xs pt-1">
           <div className="p-2 bg-slate-900 rounded-sm border border-slate-800">
             <span className="text-[10px] text-slate-400 block uppercase font-sans">2026 (current period)</span>
             <span className="text-sm font-bold text-white font-mono">{area.recentCases30d} cases</span>
@@ -168,7 +168,7 @@ export const AreaDetailPanel: React.FC<AreaDetailPanelProps> = React.memo(({
       </div>
 
       {/* Quick Action Bar for Area */}
-      <div className="flex items-center gap-2 flex-wrap">
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
         {onOpenSmsAlert && (
           <button
             onClick={() => onOpenSmsAlert(area.id)}
@@ -190,7 +190,7 @@ export const AreaDetailPanel: React.FC<AreaDetailPanelProps> = React.memo(({
       </div>
 
       {/* Hospital Capacity Overlay (Resource Allocation Angle) */}
-      <div className="bg-slate-950 border border-slate-800 rounded-sm p-4 space-y-3">
+      <div className="bg-slate-950 border border-slate-800 rounded-sm p-3 sm:p-4 space-y-3">
         <div className="flex items-center justify-between flex-wrap gap-2">
           <h3 className="text-xs font-bold text-slate-200 uppercase tracking-wider flex items-center gap-1.5">
             <Hospital className="w-4 h-4 text-slate-300" />
@@ -203,7 +203,7 @@ export const AreaDetailPanel: React.FC<AreaDetailPanelProps> = React.memo(({
 
         {/* Visual Callout Bar */}
         <div className="bg-slate-900 p-3 rounded-sm border border-slate-800 text-xs space-y-2">
-          <div className="grid grid-cols-3 gap-2 text-center">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-center">
             <div className="p-2 bg-slate-950 rounded-sm border border-slate-800">
               <span className="text-[10px] text-slate-400 block uppercase font-sans">Dengue patients</span>
               <span className="text-base font-extrabold text-red-400 font-mono">{area.currentPatients.toLocaleString()}</span>
@@ -243,7 +243,7 @@ export const AreaDetailPanel: React.FC<AreaDetailPanelProps> = React.memo(({
       </div>
 
       {/* Clinical vs Crowdsourced Data Distinction */}
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <div className="bg-slate-950 border border-blue-500/30 p-3 rounded-sm">
           <div className="text-[10px] text-blue-400 font-bold uppercase tracking-wider mb-1 flex items-center justify-between">
             <span>Official DGHS data</span>

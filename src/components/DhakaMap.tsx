@@ -43,7 +43,7 @@ export const DhakaMap: React.FC<DhakaMapProps> = React.memo(({
   };
 
   return (
-    <div className="bg-slate-900 border border-slate-800 rounded-2xl p-4 shadow-xl flex flex-col h-full min-h-[520px]">
+    <div className="bg-slate-900 border border-slate-800 rounded-2xl p-3 sm:p-4 shadow-xl flex flex-col h-full min-h-[400px] sm:min-h-[520px]">
       {/* Map Header Controls */}
       <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-slate-800">
         <div>
@@ -57,10 +57,10 @@ export const DhakaMap: React.FC<DhakaMapProps> = React.memo(({
         </div>
 
         {/* Mode Switcher Buttons */}
-        <div className="flex items-center bg-slate-800 p-1 rounded-xl border border-slate-700/80">
+        <div className="flex items-center bg-slate-800 p-1 rounded-xl border border-slate-700/80 overflow-x-auto max-w-full">
           <button
             onClick={() => onChangeViewMode('map')}
-            className={`flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-semibold transition-all ${
+            className={`flex items-center gap-1.5 px-2.5 sm:px-3 py-1 rounded-lg text-xs font-semibold transition-all shrink-0 ${
               viewMode === 'map'
                 ? 'bg-emerald-500 text-slate-950 shadow-sm'
                 : 'text-slate-300 hover:text-white hover:bg-slate-700/50'
@@ -72,7 +72,7 @@ export const DhakaMap: React.FC<DhakaMapProps> = React.memo(({
 
           <button
             onClick={() => onChangeViewMode('grid')}
-            className={`flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-semibold transition-all ${
+            className={`flex items-center gap-1.5 px-2.5 sm:px-3 py-1 rounded-lg text-xs font-semibold transition-all shrink-0 ${
               viewMode === 'grid'
                 ? 'bg-emerald-500 text-slate-950 shadow-sm'
                 : 'text-slate-300 hover:text-white hover:bg-slate-700/50'
@@ -84,7 +84,7 @@ export const DhakaMap: React.FC<DhakaMapProps> = React.memo(({
 
           <button
             onClick={() => onChangeViewMode('table')}
-            className={`flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-semibold transition-all ${
+            className={`flex items-center gap-1.5 px-2.5 sm:px-3 py-1 rounded-lg text-xs font-semibold transition-all shrink-0 ${
               viewMode === 'table'
                 ? 'bg-emerald-500 text-slate-950 shadow-sm'
                 : 'text-slate-300 hover:text-white hover:bg-slate-700/50'
@@ -98,7 +98,7 @@ export const DhakaMap: React.FC<DhakaMapProps> = React.memo(({
 
       {/* Main Vector Map Canvas */}
       {viewMode === 'map' && (
-        <div className="relative flex-1 bg-slate-950 rounded-sm mt-3 overflow-hidden border border-[#E3E1DA]/20 flex items-center justify-center min-h-[420px]">
+        <div className="relative flex-1 bg-slate-950 rounded-sm mt-3 overflow-hidden border border-[#E3E1DA]/20 flex items-center justify-center min-h-[360px] sm:min-h-[420px]">
           {/* Zoom Controls Overlay */}
           <div className="absolute top-3 right-3 z-10 flex flex-col bg-slate-900 border border-slate-700 rounded-sm p-1 gap-1">
             <button
@@ -125,14 +125,14 @@ export const DhakaMap: React.FC<DhakaMapProps> = React.memo(({
           </div>
 
           {/* Compass, Scale & Layer Switcher */}
-          <div className="absolute top-3 left-3 z-10 flex flex-wrap items-center gap-2">
-            <div className="flex items-center gap-1.5 px-2.5 py-1.5 bg-slate-900 border border-slate-700 rounded-sm text-[11px] text-slate-300">
+          <div className="absolute top-3 left-3 z-10 flex flex-wrap items-center gap-1.5 max-w-[calc(100%-54px)]">
+            <div className="flex items-center gap-1.5 px-2 py-1 bg-slate-900 border border-slate-700 rounded-sm text-[10px] sm:text-[11px] text-slate-300">
               <Navigation className="w-3.5 h-3.5 text-slate-300" />
               <span>Dhaka City Corporation</span>
             </div>
 
             {/* Layer Toggle & Comparison Mode Pill */}
-            <div className="flex items-center bg-slate-900 p-1 rounded-sm border border-slate-700 gap-1">
+            <div className="flex flex-wrap items-center bg-slate-900 p-1 rounded-sm border border-slate-700 gap-1 max-w-full">
               <button
                 onClick={() => setMapOverlay('risk')}
                 className={`px-2.5 py-1 text-[11px] font-bold rounded-sm transition-colors flex items-center gap-1 ${

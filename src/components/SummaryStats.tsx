@@ -22,7 +22,7 @@ export const SummaryStats: React.FC<SummaryStatsProps> = React.memo(({ computedA
   const maxRainfallArea = [...computedAreas].sort((a, b) => b.recentRainfallMm - a.recentRainfallMm)[0];
 
   return (
-    <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-5 gap-3 mb-4">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 mb-4">
       {/* Total 30-Day Cases */}
       <div className="bg-slate-900 border border-[#E3E1DA]/20 rounded-sm p-3.5">
         <div className="flex items-center justify-between">
@@ -85,7 +85,7 @@ export const SummaryStats: React.FC<SummaryStatsProps> = React.memo(({ computedA
       </div>
 
       {/* Peak Precipitation Area */}
-      <div className="col-span-2 sm:col-span-2 lg:col-span-1 bg-slate-900 border border-[#E3E1DA]/20 rounded-sm p-3.5">
+      <div className="col-span-1 sm:col-span-2 lg:col-span-1 bg-slate-900 border border-[#E3E1DA]/20 rounded-sm p-3.5">
         <div className="flex items-center justify-between">
           <span className="text-xs font-medium text-slate-400">Highest rainfall zone</span>
           <CloudRain className="w-4 h-4 text-slate-400" />

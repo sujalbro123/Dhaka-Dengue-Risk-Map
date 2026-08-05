@@ -78,7 +78,7 @@ export const AreaListView: React.FC<AreaListViewProps> = React.memo(({
         </div>
 
         {/* Risk Level Filter Pills */}
-        <div className="flex items-center gap-1.5">
+        <div className="flex items-center gap-1.5 flex-wrap">
           <button
             onClick={() => setFilterRisk('all')}
             className={`px-2.5 py-1 rounded-sm text-xs font-semibold transition-colors ${

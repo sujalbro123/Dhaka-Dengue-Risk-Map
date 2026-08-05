@@ -25,9 +25,9 @@ export const SimulationControls: React.FC<SimulationControlsProps> = ({
 
   return (
     <div className="bg-slate-900 border border-[#E3E1DA]/20 rounded-sm p-4 sm:p-5 mb-4 text-slate-100">
-      <div className="flex items-center justify-between pb-3 border-b border-slate-800">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-800">
         <div className="flex items-center gap-2">
-          <SlidersHorizontal className="w-4 h-4 text-slate-300" />
+          <SlidersHorizontal className="w-4 h-4 text-slate-300 shrink-0" />
           <div>
             <h3 className="font-bold text-sm sm:text-base text-white">
               Interactive model simulator & sensitivity analysis
@@ -40,7 +40,7 @@ export const SimulationControls: React.FC<SimulationControlsProps> = ({
 
         <button
           onClick={onReset}
-          className="flex items-center gap-1 px-3 py-1 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-sm text-xs font-semibold border border-slate-700 transition-colors"
+          className="self-end sm:self-auto flex items-center gap-1 px-3 py-1 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-sm text-xs font-semibold border border-slate-700 transition-colors shrink-0"
         >
           <RotateCcw className="w-3.5 h-3.5 text-slate-300" />
           <span>Reset defaults</span>
