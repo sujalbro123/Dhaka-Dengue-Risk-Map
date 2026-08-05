@@ -1,22 +1,15 @@
 import { DhakaArea, ComputedAreaRisk, ModelWeights, SimulationModifiers, RiskLevel } from '../types';
+import { MODEL_CONFIG } from '../config/appConfig';
 
-export const DEFAULT_WEIGHTS: ModelWeights = {
-  casesWeight: 0.5,
-  rainfallWeight: 0.3,
-  densityWeight: 0.2,
-};
-
-export const DEFAULT_MODIFIERS: SimulationModifiers = {
-  rainfallMultiplier: 1.0,
-  caseMultiplier: 1.0,
-  densityModifier: 1.0,
-};
+export const DEFAULT_WEIGHTS: ModelWeights = MODEL_CONFIG.defaultWeights;
+export const DEFAULT_MODIFIERS: SimulationModifiers = MODEL_CONFIG.defaultModifiers;
 
 export function calculateAreaRisks(
   areas: DhakaArea[],
   weights: ModelWeights = DEFAULT_WEIGHTS,
   modifiers: SimulationModifiers = DEFAULT_MODIFIERS
 ): ComputedAreaRisk[] {
+
   if (areas.length === 0) return [];
 
   // Calculate adjusted current raw values based on simulation modifiers or what-if rainfall
@@ -126,11 +119,11 @@ export function calculateAreaRisks(
         : `${area.name} risk score is equal to the same period last year`;
 
     let riskLevel: RiskLevel = 'low';
-    if (rawRiskScore >= 0.80) {
+    if (rawRiskScore >= MODEL_CONFIG.thresholds.criticalRisk) {
       riskLevel = 'critical';
-    } else if (rawRiskScore >= 0.60) {
+    } else if (rawRiskScore >= MODEL_CONFIG.thresholds.highRisk) {
       riskLevel = 'high';
-    } else if (rawRiskScore >= 0.35) {
+    } else if (rawRiskScore >= MODEL_CONFIG.thresholds.moderateRisk) {
       riskLevel = 'moderate';
     } else {
       riskLevel = 'low';
@@ -142,9 +135,9 @@ export function calculateAreaRisks(
     const capacityGap = currentPatients - hospitalBeds;
     const occupancyRatio = currentPatients / hospitalBeds;
     let capacityStatus: 'adequate' | 'strained' | 'overcapacity' = 'adequate';
-    if (occupancyRatio > 1.0) {
+    if (occupancyRatio > MODEL_CONFIG.thresholds.overcapacityRatio) {
       capacityStatus = 'overcapacity';
-    } else if (occupancyRatio >= 0.80) {
+    } else if (occupancyRatio >= MODEL_CONFIG.thresholds.strainedCapacityRatio) {
       capacityStatus = 'strained';
     } else {
       capacityStatus = 'adequate';

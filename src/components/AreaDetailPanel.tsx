@@ -31,7 +31,7 @@ interface AreaDetailPanelProps {
   onOpenReportCase?: (areaId: string) => void;
 }
 
-export const AreaDetailPanel: React.FC<AreaDetailPanelProps> = ({
+export const AreaDetailPanel: React.FC<AreaDetailPanelProps> = React.memo(({
   area,
   onOpenSmsAlert,
   onOpenReportCase,
@@ -53,10 +53,10 @@ export const AreaDetailPanel: React.FC<AreaDetailPanelProps> = ({
   // Hospital Capacity calculations
   const capacityStatusBadge =
     area.capacityStatus === 'overcapacity'
-      ? { label: 'Overcapacity (Bed Shortage)', bg: 'bg-red-500/20 text-red-300 border-red-500/40' }
+      ? { label: 'Overcapacity', bg: 'bg-red-500/20 text-red-300 border-red-500/40' }
       : area.capacityStatus === 'strained'
-      ? { label: 'Strained Capacity (≥80% Full)', bg: 'bg-amber-500/20 text-amber-300 border-amber-500/40' }
-      : { label: 'Adequate Capacity (<80% Occupied)', bg: 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40' };
+      ? { label: 'Strained capacity (≥80% full)', bg: 'bg-amber-500/20 text-amber-300 border-amber-500/40' }
+      : { label: 'Adequate capacity (<80% occupied)', bg: 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40' };
 
   return (
     <div className="bg-slate-900 border border-[#E3E1DA]/20 rounded-sm p-4 sm:p-5 space-y-5 overflow-y-auto max-h-[800px]">
@@ -83,7 +83,7 @@ export const AreaDetailPanel: React.FC<AreaDetailPanelProps> = ({
         <div className={`p-3.5 rounded-sm border ${badge.bg} ${badge.border} text-right min-w-[150px] flex flex-col justify-between`}>
           <div>
             <div className="text-[10px] uppercase tracking-wider font-bold text-slate-400">
-              Current Risk Score
+              Current risk score
             </div>
             <div className={`text-2xl sm:text-3xl font-extrabold font-mono ${badge.text} flex items-center justify-end gap-1.5`}>
               <span>{area.riskScore100}</span>
@@ -106,7 +106,7 @@ export const AreaDetailPanel: React.FC<AreaDetailPanelProps> = ({
           </div>
 
           <div className="mt-1 pt-1 border-t border-slate-800/80 flex items-center justify-between text-[11px]">
-            <span className="text-slate-400 font-medium">Weekly Trend:</span>
+            <span className="text-slate-400 font-medium">Weekly trend:</span>
             <span
               className={`font-bold font-mono ${
                 area.trend === 'rising'
@@ -117,9 +117,9 @@ export const AreaDetailPanel: React.FC<AreaDetailPanelProps> = ({
               }`}
             >
               {area.trend === 'rising'
-                ? `+${area.trendDelta} pts (Rising)`
+                ? `+${area.trendDelta} pts (rising)`
                 : area.trend === 'falling'
-                ? `${area.trendDelta} pts (Falling)`
+                ? `${area.trendDelta} pts (falling)`
                 : 'Stable'}
             </span>
           </div>
@@ -131,7 +131,7 @@ export const AreaDetailPanel: React.FC<AreaDetailPanelProps> = ({
         <div className="flex items-center justify-between text-xs">
           <span className="font-bold text-amber-300 uppercase tracking-wider flex items-center gap-1.5">
             <Calendar className="w-3.5 h-3.5 text-amber-300" />
-            Year-over-Year Comparison (2026 vs 2025)
+            Year-over-year comparison (2026 vs 2025)
           </span>
           <span
             className={`text-xs font-bold font-mono ${
@@ -154,15 +154,15 @@ export const AreaDetailPanel: React.FC<AreaDetailPanelProps> = ({
         {/* Comparison Metric Grid */}
         <div className="grid grid-cols-2 gap-2 text-center text-xs pt-1">
           <div className="p-2 bg-slate-900 rounded-sm border border-slate-800">
-            <span className="text-[10px] text-slate-400 block uppercase font-sans">2026 (Current Period)</span>
+            <span className="text-[10px] text-slate-400 block uppercase font-sans">2026 (current period)</span>
             <span className="text-sm font-bold text-white font-mono">{area.recentCases30d} cases</span>
-            <span className="text-[10px] text-amber-400 block mt-0.5 font-mono">Risk Score: {area.riskScore100}/100</span>
+            <span className="text-[10px] text-amber-400 block mt-0.5 font-mono">Risk score: {area.riskScore100}/100</span>
           </div>
 
           <div className="p-2 bg-slate-900 rounded-sm border border-slate-800">
-            <span className="text-[10px] text-slate-400 block uppercase font-sans">2025 (Prior Year)</span>
+            <span className="text-[10px] text-slate-400 block uppercase font-sans">2025 (prior year)</span>
             <span className="text-sm font-bold text-slate-300 font-mono">{area.priorYearCases30d} cases</span>
-            <span className="text-[10px] text-slate-400 block mt-0.5 font-mono">Risk Score: {area.priorYearRiskScore}/100</span>
+            <span className="text-[10px] text-slate-400 block mt-0.5 font-mono">Risk score: {area.priorYearRiskScore}/100</span>
           </div>
         </div>
       </div>
@@ -175,7 +175,7 @@ export const AreaDetailPanel: React.FC<AreaDetailPanelProps> = ({
             className="flex-1 py-2 px-3 bg-[#1F3A5F] hover:bg-[#1a3050] text-white border border-[#E3E1DA]/30 rounded-sm text-xs font-bold transition-colors flex items-center justify-center gap-1.5"
           >
             <ShieldAlert className="w-3.5 h-3.5 text-white" />
-            <span>Simulate SMS Alert</span>
+            <span>Simulate SMS alert</span>
           </button>
         )}
         {onOpenReportCase && (
@@ -184,7 +184,7 @@ export const AreaDetailPanel: React.FC<AreaDetailPanelProps> = ({
             className="flex-1 py-2 px-3 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 rounded-sm text-xs font-bold transition-colors flex items-center justify-center gap-1.5"
           >
             <Users className="w-3.5 h-3.5 text-slate-300" />
-            <span>Report Case Here</span>
+            <span>Report case here</span>
           </button>
         )}
       </div>
@@ -194,7 +194,7 @@ export const AreaDetailPanel: React.FC<AreaDetailPanelProps> = ({
         <div className="flex items-center justify-between flex-wrap gap-2">
           <h3 className="text-xs font-bold text-slate-200 uppercase tracking-wider flex items-center gap-1.5">
             <Hospital className="w-4 h-4 text-slate-300" />
-            Hospital Bed Capacity vs Patient Load
+            Hospital bed capacity vs patient load
           </h3>
           <span className={`px-2.5 py-0.5 rounded-sm text-[11px] font-bold border ${capacityStatusBadge.bg}`}>
             {capacityStatusBadge.label}
@@ -205,17 +205,17 @@ export const AreaDetailPanel: React.FC<AreaDetailPanelProps> = ({
         <div className="bg-slate-900 p-3 rounded-sm border border-slate-800 text-xs space-y-2">
           <div className="grid grid-cols-3 gap-2 text-center">
             <div className="p-2 bg-slate-950 rounded-sm border border-slate-800">
-              <span className="text-[10px] text-slate-400 block uppercase font-sans">Dengue Patients</span>
+              <span className="text-[10px] text-slate-400 block uppercase font-sans">Dengue patients</span>
               <span className="text-base font-extrabold text-red-400 font-mono">{area.currentPatients.toLocaleString()}</span>
             </div>
             <div className="p-2 bg-slate-950 rounded-sm border border-slate-800">
-              <span className="text-[10px] text-slate-400 block uppercase font-sans">Hospital Beds</span>
+              <span className="text-[10px] text-slate-400 block uppercase font-sans">Hospital beds</span>
               <span className="text-base font-extrabold text-blue-400 font-mono">{area.hospitalBeds.toLocaleString()}</span>
             </div>
             <div className={`p-2 rounded-sm border ${area.capacityGap > 0 ? 'bg-red-500/10 border-red-500/30 text-red-300' : 'bg-emerald-500/10 border-emerald-500/30 text-emerald-300'}`}>
-              <span className="text-[10px] block uppercase font-sans">Capacity Gap</span>
+              <span className="text-[10px] block uppercase font-sans">Capacity gap</span>
               <span className="text-base font-extrabold font-mono">
-                {area.capacityGap > 0 ? `+${area.capacityGap} Shortage` : `${Math.abs(area.capacityGap)} Available`}
+                {area.capacityGap > 0 ? `+${area.capacityGap} shortage` : `${Math.abs(area.capacityGap)} available`}
               </span>
             </div>
           </div>
@@ -223,7 +223,7 @@ export const AreaDetailPanel: React.FC<AreaDetailPanelProps> = ({
           {/* Progress bar comparison */}
           <div>
             <div className="flex justify-between text-[11px] text-slate-400 mb-1">
-              <span>Occupancy Ratio: {((area.currentPatients / area.hospitalBeds) * 100).toFixed(0)}%</span>
+              <span>Occupancy ratio: {((area.currentPatients / area.hospitalBeds) * 100).toFixed(0)}%</span>
               <span className="font-mono">{area.currentPatients} / {area.hospitalBeds} beds</span>
             </div>
             <div className="w-full h-2.5 bg-slate-800 rounded-sm overflow-hidden relative">
@@ -246,7 +246,7 @@ export const AreaDetailPanel: React.FC<AreaDetailPanelProps> = ({
       <div className="grid grid-cols-2 gap-3">
         <div className="bg-slate-950 border border-blue-500/30 p-3 rounded-sm">
           <div className="text-[10px] text-blue-400 font-bold uppercase tracking-wider mb-1 flex items-center justify-between">
-            <span>Official DGHS Data</span>
+            <span>Official DGHS data</span>
             <span className="text-[9px] bg-blue-500/20 px-1.5 py-0.5 rounded-sm text-blue-300">Verified</span>
           </div>
           <div className="text-xl font-bold text-white font-mono">{area.recentCases30d} <span className="text-xs text-slate-400 font-normal font-sans">cases (30d)</span></div>
@@ -255,7 +255,7 @@ export const AreaDetailPanel: React.FC<AreaDetailPanelProps> = ({
 
         <div className="bg-slate-950 border border-purple-500/30 p-3 rounded-sm">
           <div className="text-[10px] text-purple-400 font-bold uppercase tracking-wider mb-1 flex items-center justify-between">
-            <span>Community Reported</span>
+            <span>Community reported</span>
             <span className="text-[9px] bg-purple-500/20 px-1.5 py-0.5 rounded-sm text-purple-300">Unverified</span>
           </div>
           <div className="text-xl font-bold text-white font-mono">{area.crowdsourcedReports} <span className="text-xs text-slate-400 font-normal font-sans">reports</span></div>
@@ -267,7 +267,7 @@ export const AreaDetailPanel: React.FC<AreaDetailPanelProps> = ({
       <div>
         <h3 className="text-xs font-bold text-slate-300 uppercase tracking-wider mb-2.5 flex items-center gap-1.5">
           <Award className="w-4 h-4 text-slate-300" />
-          Weighted Risk Factor Breakdown
+          Weighted risk factor breakdown
         </h3>
 
         <div className="space-y-3 bg-slate-950 border border-slate-800 rounded-sm p-3.5">
@@ -276,7 +276,7 @@ export const AreaDetailPanel: React.FC<AreaDetailPanelProps> = ({
             <div className="flex justify-between items-center text-xs mb-1">
               <span className="font-semibold text-slate-200 flex items-center gap-1">
                 <TrendingUp className="w-3.5 h-3.5 text-blue-400" />
-                Historical Cases (50% Weight)
+                Historical cases (50% weight)
               </span>
               <span className="font-mono text-slate-300">
                 {area.recentCases30d} cases →{' '}
@@ -300,7 +300,7 @@ export const AreaDetailPanel: React.FC<AreaDetailPanelProps> = ({
             <div className="flex justify-between items-center text-xs mb-1">
               <span className="font-semibold text-slate-200 flex items-center gap-1">
                 <Droplets className="w-3.5 h-3.5 text-cyan-400" />
-                Recent Rainfall (30% Weight)
+                Recent rainfall (30% weight)
               </span>
               <span className="font-mono text-slate-300">
                 {area.recentRainfallMm} mm →{' '}
@@ -324,7 +324,7 @@ export const AreaDetailPanel: React.FC<AreaDetailPanelProps> = ({
             <div className="flex justify-between items-center text-xs mb-1">
               <span className="font-semibold text-slate-200 flex items-center gap-1">
                 <Users className="w-3.5 h-3.5 text-purple-400" />
-                Population Density (20% Weight)
+                Population density (20% weight)
               </span>
               <span className="font-mono text-slate-300">
                 {area.populationDensity.toLocaleString()} /km² →{' '}
@@ -348,37 +348,45 @@ export const AreaDetailPanel: React.FC<AreaDetailPanelProps> = ({
       {/* Historical Trend Chart (Recharts Line & Bar) */}
       <div>
         <h3 className="text-xs font-bold text-slate-300 uppercase tracking-wider mb-2.5">
-          6-Month Epidemic Progression vs Rainfall
+          6-month case progression and rainfall
         </h3>
 
-        <div className="bg-slate-950 border border-slate-800 rounded-sm p-3 h-52">
-          <ResponsiveContainer width="100%" height="100%">
-            <ComposedChart data={area.monthlyHistory} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#334155" opacity={0.5} />
-              <XAxis dataKey="month" stroke="#94a3b8" fontSize={11} />
-              <YAxis yAxisId="left" stroke="#3b82f6" fontSize={11} />
-              <YAxis yAxisId="right" orientation="right" stroke="#06b6d4" fontSize={11} />
-              <Tooltip
-                contentStyle={{
-                  backgroundColor: '#0f172a',
-                  borderColor: '#334155',
-                  borderRadius: '2px',
-                  fontSize: '12px',
-                }}
-              />
-              <Legend wrapperStyle={{ fontSize: '11px', paddingTop: '5px' }} />
-              <Bar yAxisId="right" dataKey="rainfallMm" name="Rainfall (mm)" fill="#0284c7" opacity={0.4} barSize={20} />
-              <Line yAxisId="left" type="monotone" dataKey="cases" name="Dengue Cases" stroke="#ef4444" strokeWidth={2.5} dot={{ r: 4, fill: '#ef4444' }} />
-            </ComposedChart>
-          </ResponsiveContainer>
-        </div>
+        {!area.monthlyHistory || area.monthlyHistory.length === 0 ? (
+          <div className="bg-slate-950 border border-slate-800 rounded-sm p-6 text-center text-slate-400 flex flex-col items-center justify-center h-52">
+            <Calendar className="w-8 h-8 text-slate-600 mb-2" />
+            <span className="text-xs font-bold text-slate-200">No data available for this period</span>
+            <span className="text-[11px] text-slate-500 mt-1">Historical monthly surveillance records are missing for this zone.</span>
+          </div>
+        ) : (
+          <div className="bg-slate-950 border border-slate-800 rounded-sm p-3 h-52">
+            <ResponsiveContainer width="100%" height="100%">
+              <ComposedChart data={area.monthlyHistory} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#334155" opacity={0.5} />
+                <XAxis dataKey="month" stroke="#94a3b8" fontSize={11} />
+                <YAxis yAxisId="left" stroke="#3b82f6" fontSize={11} />
+                <YAxis yAxisId="right" orientation="right" stroke="#06b6d4" fontSize={11} />
+                <Tooltip
+                  contentStyle={{
+                    backgroundColor: '#0f172a',
+                    borderColor: '#334155',
+                    borderRadius: '2px',
+                    fontSize: '12px',
+                  }}
+                />
+                <Legend wrapperStyle={{ fontSize: '11px', paddingTop: '5px' }} />
+                <Bar yAxisId="right" dataKey="rainfallMm" name="Rainfall (mm)" fill="#0284c7" opacity={0.4} barSize={20} />
+                <Line yAxisId="left" type="monotone" dataKey="cases" name="Dengue Cases" stroke="#ef4444" strokeWidth={2.5} dot={{ r: 4, fill: '#ef4444' }} />
+              </ComposedChart>
+            </ResponsiveContainer>
+          </div>
+        )}
       </div>
 
       {/* Key Vulnerabilities & Risk Factors */}
       <div>
         <h3 className="text-xs font-bold text-slate-300 uppercase tracking-wider mb-2 flex items-center gap-1.5">
           <AlertTriangle className="w-4 h-4 text-amber-400" />
-          Area Risk Vulnerabilities
+          Area risk vulnerabilities
         </h3>
         <ul className="space-y-1.5 text-xs text-slate-300 bg-slate-950 p-3 rounded-sm border border-[#E3E1DA]">
           {area.keyRiskFactors.map((factor, idx) => (
@@ -394,7 +402,7 @@ export const AreaDetailPanel: React.FC<AreaDetailPanelProps> = ({
       <div>
         <h3 className="text-xs font-bold text-slate-300 uppercase tracking-wider mb-2 flex items-center gap-1.5">
           <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-          Recommended Vector Control Protocol
+          Recommended vector control protocol
         </h3>
         <div className="space-y-2">
           {area.preventionTips.map((tip, idx) => (
@@ -414,19 +422,19 @@ export const AreaDetailPanel: React.FC<AreaDetailPanelProps> = ({
         <div className="bg-slate-950 p-3 rounded-sm border border-slate-800">
           <div className="font-semibold text-slate-300 mb-1 flex items-center gap-1">
             <Building2 className="w-3.5 h-3.5 text-slate-400" />
-            Demographic Context
+            Demographic context
           </div>
           <div className="space-y-1 text-slate-400">
             <div>Population: <strong className="text-slate-200 font-mono">{area.population.toLocaleString()}</strong></div>
-            <div>Area Size: <strong className="text-slate-200 font-mono">{area.areaSqKm} sq km</strong></div>
-            <div>Aedes Breteau Index: <strong className="text-amber-400 font-mono">{area.breteauIndex}</strong></div>
+            <div>Area size: <strong className="text-slate-200 font-mono">{area.areaSqKm} sq km</strong></div>
+            <div>Aedes Breteau index: <strong className="text-amber-400 font-mono">{area.breteauIndex}</strong></div>
           </div>
         </div>
 
         <div className="bg-slate-950 p-3 rounded-sm border border-slate-800">
           <div className="font-semibold text-slate-300 mb-1 flex items-center gap-1">
             <Hospital className="w-3.5 h-3.5 text-slate-400" />
-            Key Hospitals in Zone
+            Hospitals in zone
           </div>
           <ul className="space-y-1 text-slate-300">
             {area.primaryHospitals.map((hosp, i) => (
@@ -437,4 +445,5 @@ export const AreaDetailPanel: React.FC<AreaDetailPanelProps> = ({
       </div>
     </div>
   );
-};
+});
+

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { ComputedAreaRisk, RiskLevel } from '../types';
 import { getRiskBadgeColor } from '../utils/riskCalculator';
 import { Activity, CloudRain, Users, Search, ArrowUpDown, ChevronRight, AlertCircle } from 'lucide-react';
@@ -10,7 +10,7 @@ interface AreaListViewProps {
   viewMode: 'grid' | 'table';
 }
 
-export const AreaListView: React.FC<AreaListViewProps> = ({
+export const AreaListView: React.FC<AreaListViewProps> = React.memo(({
   areas,
   selectedAreaId,
   onSelectArea,
@@ -21,34 +21,36 @@ export const AreaListView: React.FC<AreaListViewProps> = ({
   const [sortBy, setSortBy] = useState<'risk' | 'cases' | 'rain' | 'density'>('risk');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
 
-  // Filter and sort logic
-  const filteredAreas = areas
-    .filter((a) => {
-      const matchesSearch =
-        a.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        a.bnName.includes(searchQuery) ||
-        a.corporation.toLowerCase().includes(searchQuery.toLowerCase());
-      const matchesFilter = filterRisk === 'all' || a.riskLevel === filterRisk;
-      return matchesSearch && matchesFilter;
-    })
-    .sort((a, b) => {
-      let valA = 0;
-      let valB = 0;
-      if (sortBy === 'risk') {
-        valA = a.riskScore100;
-        valB = b.riskScore100;
-      } else if (sortBy === 'cases') {
-        valA = a.recentCases30d;
-        valB = b.recentCases30d;
-      } else if (sortBy === 'rain') {
-        valA = a.recentRainfallMm;
-        valB = b.recentRainfallMm;
-      } else if (sortBy === 'density') {
-        valA = a.populationDensity;
-        valB = b.populationDensity;
-      }
-      return sortOrder === 'desc' ? valB - valA : valA - valB;
-    });
+  // Filter and sort logic with memoization
+  const filteredAreas = useMemo(() => {
+    return areas
+      .filter((a) => {
+        const matchesSearch =
+          a.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          a.bnName.includes(searchQuery) ||
+          a.corporation.toLowerCase().includes(searchQuery.toLowerCase());
+        const matchesFilter = filterRisk === 'all' || a.riskLevel === filterRisk;
+        return matchesSearch && matchesFilter;
+      })
+      .sort((a, b) => {
+        let valA = 0;
+        let valB = 0;
+        if (sortBy === 'risk') {
+          valA = a.riskScore100;
+          valB = b.riskScore100;
+        } else if (sortBy === 'cases') {
+          valA = a.recentCases30d;
+          valB = b.recentCases30d;
+        } else if (sortBy === 'rain') {
+          valA = a.recentRainfallMm;
+          valB = b.recentRainfallMm;
+        } else if (sortBy === 'density') {
+          valA = a.populationDensity;
+          valB = b.populationDensity;
+        }
+        return sortOrder === 'desc' ? valB - valA : valA - valB;
+      });
+  }, [areas, searchQuery, filterRisk, sortBy, sortOrder]);
 
   const toggleSort = (type: 'risk' | 'cases' | 'rain' | 'density') => {
     if (sortBy === type) {
@@ -68,7 +70,7 @@ export const AreaListView: React.FC<AreaListViewProps> = ({
           <Search className="w-4 h-4 absolute left-3 top-2.5 text-slate-400" />
           <input
             type="text"
-            placeholder="Search Thana or Ward..."
+            placeholder="Search thana or ward..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="w-full pl-9 pr-3 py-1.5 bg-slate-950 border border-slate-800 rounded-sm text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-slate-600"
@@ -119,6 +121,26 @@ export const AreaListView: React.FC<AreaListViewProps> = ({
           </button>
         </div>
       </div>
+
+      {/* Empty Filter State */}
+      {filteredAreas.length === 0 && (
+        <div className="bg-slate-950 border border-slate-800 rounded-sm p-8 text-center text-slate-400 my-4 flex flex-col items-center justify-center">
+          <AlertCircle className="w-8 h-8 text-slate-600 mb-2" />
+          <div className="text-sm font-bold text-slate-300">No data available for this query or period</div>
+          <div className="text-xs text-slate-500 mt-1 max-w-xs">
+            No Dhaka thanas match your search query or selected risk level filter. Try clearing your search input.
+          </div>
+          <button
+            onClick={() => {
+              setSearchQuery('');
+              setFilterRisk('all');
+            }}
+            className="mt-3 px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 rounded-sm text-xs font-semibold"
+          >
+            Reset filters
+          </button>
+        </div>
+      )}
 
       {/* Grid View Mode */}
       {viewMode === 'grid' && (
@@ -230,19 +252,19 @@ export const AreaListView: React.FC<AreaListViewProps> = ({
           <table className="w-full text-left border-collapse text-xs">
             <thead className="bg-slate-950 text-slate-400 sticky top-0 border-b border-slate-800 uppercase text-[10px] font-bold tracking-wider">
               <tr>
-                <th className="p-3">Thana / Area</th>
+                <th className="p-3">Thana / area</th>
                 <th className="p-3">Corp</th>
                 <th className="p-3 cursor-pointer hover:text-white" onClick={() => toggleSort('risk')}>
                   <div className="flex items-center gap-1">
-                    <span>Risk Score</span>
+                    <span>Risk score</span>
                     <ArrowUpDown className="w-3 h-3" />
                   </div>
                 </th>
                 <th className="p-3">Trend</th>
-                <th className="p-3">vs Last Year (YoY)</th>
+                <th className="p-3">vs prior year (YoY)</th>
                 <th className="p-3 cursor-pointer hover:text-white" onClick={() => toggleSort('cases')}>
                   <div className="flex items-center gap-1">
-                    <span>30d Cases (50%)</span>
+                    <span>30-day cases (50%)</span>
                     <ArrowUpDown className="w-3 h-3" />
                   </div>
                 </th>
@@ -258,7 +280,7 @@ export const AreaListView: React.FC<AreaListViewProps> = ({
                     <ArrowUpDown className="w-3 h-3" />
                   </div>
                 </th>
-                <th className="p-3">Breteau Index</th>
+                <th className="p-3">Breteau index</th>
                 <th className="p-3 text-right">Action</th>
               </tr>
             </thead>
@@ -334,4 +356,5 @@ export const AreaListView: React.FC<AreaListViewProps> = ({
       )}
     </div>
   );
-};
+});
+

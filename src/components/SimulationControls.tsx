@@ -30,10 +30,10 @@ export const SimulationControls: React.FC<SimulationControlsProps> = ({
           <SlidersHorizontal className="w-4 h-4 text-slate-300" />
           <div>
             <h3 className="font-bold text-sm sm:text-base text-white">
-              Interactive Model Simulator & Sensitivity Analysis
+              Interactive model simulator & sensitivity analysis
             </h3>
             <p className="text-xs text-slate-400">
-              Adjust environmental drivers or change formula weights to present sensitivity analysis
+              Adjust environmental drivers or formula weights to analyze risk sensitivity
             </p>
           </div>
         </div>
@@ -43,7 +43,7 @@ export const SimulationControls: React.FC<SimulationControlsProps> = ({
           className="flex items-center gap-1 px-3 py-1 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-sm text-xs font-semibold border border-slate-700 transition-colors"
         >
           <RotateCcw className="w-3.5 h-3.5 text-slate-300" />
-          <span>Reset Defaults</span>
+          <span>Reset defaults</span>
         </button>
       </div>
 
@@ -52,7 +52,7 @@ export const SimulationControls: React.FC<SimulationControlsProps> = ({
         <div className="space-y-4 bg-slate-950/60 p-3.5 rounded-sm border border-slate-800">
           <div className="text-xs font-bold text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
             <Flame className="w-4 h-4 text-slate-400" />
-            Environmental & Surge Modifiers
+            Environmental & surge modifiers
           </div>
 
           {/* Rainfall Multiplier Slider */}
@@ -60,7 +60,7 @@ export const SimulationControls: React.FC<SimulationControlsProps> = ({
             <div className="flex justify-between items-center text-xs mb-1">
               <span className="text-slate-300 font-semibold flex items-center gap-1">
                 <CloudRain className="w-3.5 h-3.5 text-slate-400" />
-                Rainfall Intensity Multiplier:
+                Rainfall intensity multiplier:
               </span>
               <span className="font-mono font-bold text-cyan-400">
                 {modifiers.rainfallMultiplier.toFixed(2)}x ({Math.round((modifiers.rainfallMultiplier - 1) * 100)}%)
@@ -81,9 +81,9 @@ export const SimulationControls: React.FC<SimulationControlsProps> = ({
               className="w-full h-1.5 bg-slate-800 rounded-sm appearance-none cursor-pointer accent-cyan-400"
             />
             <div className="flex justify-between text-[10px] text-slate-500 mt-0.5">
-              <span>Dry Drought (0.3x)</span>
+              <span>Dry (0.3x)</span>
               <span>Baseline (1.0x)</span>
-              <span>Monsoon Deluge (2.5x)</span>
+              <span>Heavy rain (2.5x)</span>
             </div>
           </div>
 
@@ -92,7 +92,7 @@ export const SimulationControls: React.FC<SimulationControlsProps> = ({
             <div className="flex justify-between items-center text-xs mb-1">
               <span className="text-slate-300 font-semibold flex items-center gap-1">
                 <Activity className="w-3.5 h-3.5 text-slate-400" />
-                Recent Infection Surge Factor:
+                Recent case surge factor:
               </span>
               <span className="font-mono font-bold text-red-400">
                 {modifiers.caseMultiplier.toFixed(2)}x
@@ -113,9 +113,9 @@ export const SimulationControls: React.FC<SimulationControlsProps> = ({
               className="w-full h-1.5 bg-slate-800 rounded-sm appearance-none cursor-pointer accent-red-500"
             />
             <div className="flex justify-between text-[10px] text-slate-500 mt-0.5">
-              <span>Low Transmission (0.3x)</span>
+              <span>Low transmission (0.3x)</span>
               <span>Normal (1.0x)</span>
-              <span>Epidemic Spike (2.5x)</span>
+              <span>High surge (2.5x)</span>
             </div>
           </div>
         </div>
@@ -124,13 +124,13 @@ export const SimulationControls: React.FC<SimulationControlsProps> = ({
         <div className="space-y-4 bg-slate-950/60 p-3.5 rounded-sm border border-slate-800">
           <div className="text-xs font-bold text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
             <Info className="w-4 h-4 text-slate-400" />
-            Formula Weight Coefficients (Sum = 1.0)
+            Formula weight coefficients (sum = 1.0)
           </div>
 
           {/* Cases Weight */}
           <div>
             <div className="flex justify-between items-center text-xs mb-1">
-              <span className="text-slate-300 font-semibold">Cases Weight (Default 0.50):</span>
+              <span className="text-slate-300 font-semibold">Cases weight (default 0.50):</span>
               <span className="font-mono font-bold text-blue-400">{weights.casesWeight.toFixed(2)}</span>
             </div>
             <input
@@ -152,7 +152,7 @@ export const SimulationControls: React.FC<SimulationControlsProps> = ({
           {/* Rainfall Weight */}
           <div>
             <div className="flex justify-between items-center text-xs mb-1">
-              <span className="text-slate-300 font-semibold">Rainfall Weight (Default 0.30):</span>
+              <span className="text-slate-300 font-semibold">Rainfall weight (default 0.30):</span>
               <span className="font-mono font-bold text-cyan-400">{weights.rainfallWeight.toFixed(2)}</span>
             </div>
             <input
@@ -174,7 +174,7 @@ export const SimulationControls: React.FC<SimulationControlsProps> = ({
           {/* Density Weight */}
           <div>
             <div className="flex justify-between items-center text-xs mb-1">
-              <span className="text-slate-300 font-semibold">Density Weight (Default 0.20):</span>
+              <span className="text-slate-300 font-semibold">Density weight (default 0.20):</span>
               <span className="font-mono font-bold text-purple-400">{weights.densityWeight.toFixed(2)}</span>
             </div>
             <input

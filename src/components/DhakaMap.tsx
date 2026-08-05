@@ -14,7 +14,7 @@ interface DhakaMapProps {
   onToggleCompareMode?: () => void;
 }
 
-export const DhakaMap: React.FC<DhakaMapProps> = ({
+export const DhakaMap: React.FC<DhakaMapProps> = React.memo(({
   areas,
   selectedAreaId,
   onSelectArea,
@@ -49,7 +49,7 @@ export const DhakaMap: React.FC<DhakaMapProps> = ({
         <div>
           <h2 className="text-base sm:text-lg font-bold text-white flex items-center gap-2">
             <MapIcon className="w-5 h-5 text-emerald-400" />
-            Interactive Dhaka Thana Risk Map
+            Interactive Dhaka thana risk map
           </h2>
           <p className="text-xs text-slate-400">
             Click any zone to inspect epidemiology & risk breakdown
@@ -516,7 +516,7 @@ export const DhakaMap: React.FC<DhakaMapProps> = ({
 
                 <div className="space-y-1.5 text-slate-300">
                   <div className="flex justify-between items-center">
-                    <span className="text-slate-400">Risk Score:</span>
+                    <span className="text-slate-400">Risk score:</span>
                     <span className="font-bold text-amber-400 flex items-center gap-1 font-mono">
                       <span>{hoveredArea.riskScore100} / 100</span>
                       {/* Trend Arrow */}
@@ -542,7 +542,7 @@ export const DhakaMap: React.FC<DhakaMapProps> = ({
                   <div className="p-1.5 bg-slate-950 border border-slate-800 rounded-sm text-[10px] space-y-1">
                     <div className="flex justify-between items-center font-mono">
                       <span className="text-slate-400 font-sans flex items-center gap-1">
-                        <Wind className="w-3 h-3 text-cyan-400" /> Wind Vector:
+                        <Wind className="w-3 h-3 text-cyan-400" /> Wind vector:
                       </span>
                       <span className="font-bold text-cyan-300">
                         {hoveredArea.windSpeedKmH ?? 16} km/h {hoveredArea.windDirectionCardinal ?? 'SSW'} ({hoveredArea.windDirectionDegrees ?? 210}°)
@@ -550,7 +550,7 @@ export const DhakaMap: React.FC<DhakaMapProps> = ({
                     </div>
                     <div className="flex justify-between items-center font-mono">
                       <span className="text-slate-400 font-sans flex items-center gap-1">
-                        <Thermometer className="w-3 h-3 text-amber-400" /> Surface Temp:
+                        <Thermometer className="w-3 h-3 text-amber-400" /> Surface temp:
                       </span>
                       <span className="font-bold text-amber-300">
                         {hoveredArea.temperatureC ?? 32.0}°C {hoveredArea.temperatureC && hoveredArea.temperatureC >= 33.5 ? '(Heat Island)' : ''}
@@ -569,15 +569,15 @@ export const DhakaMap: React.FC<DhakaMapProps> = ({
 
                   <div className="pt-1 border-t border-slate-800 space-y-1">
                     <div className="flex justify-between font-mono">
-                      <span className="text-slate-400 font-sans">Dengue Patients:</span>
+                      <span className="text-slate-400 font-sans">Dengue patients:</span>
                       <span className="font-semibold text-red-400">{hoveredArea.currentPatients}</span>
                     </div>
                     <div className="flex justify-between font-mono">
-                      <span className="text-slate-400 font-sans">Hospital Beds:</span>
+                      <span className="text-slate-400 font-sans">Hospital beds:</span>
                       <span className="font-semibold text-blue-400">{hoveredArea.hospitalBeds}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-slate-400">Bed Capacity Status:</span>
+                      <span className="text-slate-400">Bed capacity status:</span>
                       <span className={`font-bold ${
                         hoveredArea.capacityStatus === 'overcapacity' ? 'text-red-400' :
                         hoveredArea.capacityStatus === 'strained' ? 'text-amber-400' : 'text-emerald-400'
@@ -588,7 +588,7 @@ export const DhakaMap: React.FC<DhakaMapProps> = ({
                   </div>
 
                   <div className="pt-1 border-t border-slate-800 flex justify-between text-[11px]">
-                    <span className="text-slate-400">Community Reports:</span>
+                    <span className="text-slate-400">Community reports:</span>
                     <span className="font-semibold text-purple-300 font-mono">{hoveredArea.crowdsourcedReports} reports</span>
                   </div>
                 </div>
@@ -599,4 +599,5 @@ export const DhakaMap: React.FC<DhakaMapProps> = ({
       )}
     </div>
   );
-};
+});
+

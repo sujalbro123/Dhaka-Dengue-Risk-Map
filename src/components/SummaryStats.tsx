@@ -6,7 +6,7 @@ interface SummaryStatsProps {
   computedAreas: ComputedAreaRisk[];
 }
 
-export const SummaryStats: React.FC<SummaryStatsProps> = ({ computedAreas }) => {
+export const SummaryStats: React.FC<SummaryStatsProps> = React.memo(({ computedAreas }) => {
   if (computedAreas.length === 0) return null;
 
   const totalCases30d = computedAreas.reduce((acc, a) => acc + a.recentCases30d, 0);
@@ -26,21 +26,21 @@ export const SummaryStats: React.FC<SummaryStatsProps> = ({ computedAreas }) => 
       {/* Total 30-Day Cases */}
       <div className="bg-slate-900 border border-[#E3E1DA]/20 rounded-sm p-3.5">
         <div className="flex items-center justify-between">
-          <span className="text-xs font-medium text-slate-400">Total Dhaka Cases (30d)</span>
+          <span className="text-xs font-medium text-slate-400">Total Dhaka cases (30d)</span>
           <Activity className="w-4 h-4 text-slate-400" />
         </div>
         <div className="mt-2 flex items-baseline justify-between">
           <span className="text-xl sm:text-2xl font-bold text-white tracking-tight font-mono">
             {totalCases30d.toLocaleString()}
           </span>
-          <span className="text-xs text-slate-400">Across 12 Thanas</span>
+          <span className="text-xs text-slate-400">Across 12 thanas</span>
         </div>
       </div>
 
       {/* High Risk Alert Zones */}
       <div className="bg-slate-900 border border-red-500/40 rounded-sm p-3.5">
         <div className="flex items-center justify-between">
-          <span className="text-xs font-medium text-red-400">High Risk Zones</span>
+          <span className="text-xs font-medium text-red-400">High risk zones</span>
           <AlertTriangle className="w-4 h-4 text-red-400" />
         </div>
         <div className="mt-2 flex items-baseline justify-between">
@@ -49,7 +49,7 @@ export const SummaryStats: React.FC<SummaryStatsProps> = ({ computedAreas }) => 
             <span className="text-xs font-normal text-slate-400">/ {computedAreas.length}</span>
           </span>
           <span className="text-[11px] text-red-300 font-medium">
-            {((highRiskPopulation / totalPopulation) * 100).toFixed(0)}% Pop. Exposed
+            {((highRiskPopulation / totalPopulation) * 100).toFixed(0)}% pop. exposed
           </span>
         </div>
       </div>
@@ -57,7 +57,7 @@ export const SummaryStats: React.FC<SummaryStatsProps> = ({ computedAreas }) => 
       {/* Average Dhaka City Risk Index */}
       <div className="bg-slate-900 border border-[#E3E1DA]/20 rounded-sm p-3.5">
         <div className="flex items-center justify-between">
-          <span className="text-xs font-medium text-slate-400">Avg City Risk Index</span>
+          <span className="text-xs font-medium text-slate-400">Average city risk index</span>
           <ShieldCheck className="w-4 h-4 text-slate-400" />
         </div>
         <div className="mt-2 flex items-baseline justify-between">
@@ -65,14 +65,14 @@ export const SummaryStats: React.FC<SummaryStatsProps> = ({ computedAreas }) => 
             {avgRiskScore}
             <span className="text-xs font-normal text-slate-400"> / 100</span>
           </span>
-          <span className="text-xs text-slate-400">Moderate Threat</span>
+          <span className="text-xs text-slate-400">Moderate risk</span>
         </div>
       </div>
 
       {/* Highest Epidemic Hotspot */}
       <div className="bg-slate-900 border border-[#E3E1DA]/20 rounded-sm p-3.5">
         <div className="flex items-center justify-between">
-          <span className="text-xs font-medium text-slate-400">Peak Outbreak Hotspot</span>
+          <span className="text-xs font-medium text-slate-400">Highest risk zone</span>
           <Users className="w-4 h-4 text-slate-400" />
         </div>
         <div className="mt-2">
@@ -87,17 +87,17 @@ export const SummaryStats: React.FC<SummaryStatsProps> = ({ computedAreas }) => 
       {/* Peak Precipitation Area */}
       <div className="col-span-2 sm:col-span-2 lg:col-span-1 bg-slate-900 border border-[#E3E1DA]/20 rounded-sm p-3.5">
         <div className="flex items-center justify-between">
-          <span className="text-xs font-medium text-slate-400">Peak Rainfall Zone</span>
+          <span className="text-xs font-medium text-slate-400">Highest rainfall zone</span>
           <CloudRain className="w-4 h-4 text-slate-400" />
         </div>
         <div className="mt-2">
           <div className="text-sm font-bold text-white truncate">{maxRainfallArea?.name}</div>
           <div className="flex justify-between items-center text-xs text-cyan-300 font-medium mt-0.5 font-mono">
             <span>{maxRainfallArea?.recentRainfallMm} mm rainfall</span>
-            <span className="text-slate-400 font-normal">Aedes vector boost</span>
+            <span className="text-slate-400 font-normal">Vector risk factor</span>
           </div>
         </div>
       </div>
     </div>
   );
-};
+});

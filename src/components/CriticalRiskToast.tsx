@@ -52,10 +52,10 @@ export const CriticalRiskToast: React.FC<CriticalRiskToastProps> = ({
             </div>
             <div>
               <div className="text-[10px] font-extrabold uppercase tracking-[0.2em] text-red-200">
-                Simulation Alert
+                Simulation alert
               </div>
               <h4 className="text-xs sm:text-sm font-black tracking-tight flex items-center gap-1.5">
-                CRITICAL DENGUE THREAT DETECTED
+                High dengue risk detected
               </h4>
             </div>
           </div>
@@ -63,14 +63,14 @@ export const CriticalRiskToast: React.FC<CriticalRiskToastProps> = ({
           <div className="flex items-center gap-1">
             <button
               onClick={() => setIsMuted(!isMuted)}
-              title={isMuted ? 'Unmute Audio Warning' : 'Mute Audio Warning'}
+              title={isMuted ? 'Unmute audio warning' : 'Mute audio warning'}
               className="p-1 hover:bg-black/20 rounded-sm transition-colors text-red-100"
             >
               {isMuted ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
             </button>
             <button
               onClick={onDismiss}
-              title="Dismiss Alert"
+              title="Dismiss alert"
               className="p-1 hover:bg-black/20 rounded-sm transition-colors text-red-100"
             >
               <X className="w-4 h-4" />
@@ -81,8 +81,8 @@ export const CriticalRiskToast: React.FC<CriticalRiskToastProps> = ({
         {/* Banner Content Body */}
         <div className="p-4 bg-[#0f1218] text-slate-100 space-y-3">
           <p className="text-xs text-slate-300 leading-relaxed">
-            Simulation adjustments escalated risk score above <strong className="text-red-400">80/100 (0.80 Critical Threshold)</strong> in{' '}
-            <strong className="text-white">{criticalAreas.length} Thana{criticalAreas.length > 1 ? 's' : ''}</strong>:
+            Simulation adjustments raised the risk score above <strong className="text-red-400">80/100 threshold</strong> in{' '}
+            <strong className="text-white">{criticalAreas.length} thana{criticalAreas.length > 1 ? 's' : ''}</strong>:
           </p>
 
           {/* List of Critical Areas */}
@@ -121,7 +121,7 @@ export const CriticalRiskToast: React.FC<CriticalRiskToastProps> = ({
           <div className="pt-2 border-t border-slate-800 flex items-center justify-between text-[11px]">
             <span className="text-slate-400 flex items-center gap-1">
               <ShieldAlert className="w-3.5 h-3.5 text-red-400" />
-              Immediate Vector Control Recommended
+              Vector control recommended
             </span>
             <button
               onClick={onDismiss}

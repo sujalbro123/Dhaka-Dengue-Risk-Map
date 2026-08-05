@@ -82,10 +82,10 @@ export const SmsAlertModal: React.FC<SmsAlertModalProps> = ({
             </div>
             <div>
               <h3 className="text-base font-bold text-white flex items-center gap-2">
-                Simulate Public SMS & Emergency Broadcast
+                Simulate public SMS & emergency broadcast
               </h3>
               <p className="text-xs text-slate-400">
-                Interactive Lock Screen Simulation for Academic Demo
+                Lock screen preview for demonstration
               </p>
             </div>
           </div>
@@ -100,7 +100,7 @@ export const SmsAlertModal: React.FC<SmsAlertModalProps> = ({
                 }`}
               >
                 <Smartphone className="w-3.5 h-3.5" />
-                Phone Simulator
+                Phone simulator
               </button>
               <button
                 onClick={() => setActiveTab('log')}
@@ -109,7 +109,7 @@ export const SmsAlertModal: React.FC<SmsAlertModalProps> = ({
                 }`}
               >
                 <History className="w-3.5 h-3.5" />
-                Sent Log ({sentAlerts.length})
+                Sent log ({sentAlerts.length})
               </button>
             </div>
 
@@ -130,7 +130,7 @@ export const SmsAlertModal: React.FC<SmsAlertModalProps> = ({
               <div className="space-y-4">
                 <div>
                   <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1">
-                    Select Target Zone
+                    Select target zone
                   </label>
                   <select
                     value={selectedAreaId}
@@ -147,7 +147,7 @@ export const SmsAlertModal: React.FC<SmsAlertModalProps> = ({
 
                 <div>
                   <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1">
-                    Alert Delivery Channel
+                    Alert delivery channel
                   </label>
                   <div className="grid grid-cols-3 gap-2">
                     {(['SMS', 'Emergency Push', 'Public Broadcast'] as const).map((ch) => (
@@ -169,7 +169,7 @@ export const SmsAlertModal: React.FC<SmsAlertModalProps> = ({
 
                 <div>
                   <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1">
-                    Alert Message Body
+                    Alert message body
                   </label>
                   <textarea
                     rows={4}
@@ -180,7 +180,7 @@ export const SmsAlertModal: React.FC<SmsAlertModalProps> = ({
                 </div>
 
                 <div className="p-3 bg-slate-900 border border-slate-800 rounded-sm text-xs text-slate-300 flex items-center justify-between">
-                  <span>Est. Mobile Subscribers Reached:</span>
+                  <span>Est. mobile subscribers reached:</span>
                   <strong className="font-mono text-sm text-white">
                     {targetArea ? Math.round(targetArea.population * 0.15).toLocaleString() : '0'} residents
                   </strong>
@@ -195,12 +195,12 @@ export const SmsAlertModal: React.FC<SmsAlertModalProps> = ({
                   {sentSuccess ? (
                     <>
                       <CheckCircle2 className="w-4 h-4 text-emerald-300" />
-                      <span>Alert Broadcasted to Log!</span>
+                      <span>Alert broadcasted to log</span>
                     </>
                   ) : (
                     <>
                       <Send className="w-4 h-4" />
-                      <span>Simulate Broadcast to {targetArea?.name}</span>
+                      <span>Simulate broadcast to {targetArea?.name}</span>
                     </>
                   )}
                 </button>
@@ -210,7 +210,7 @@ export const SmsAlertModal: React.FC<SmsAlertModalProps> = ({
               <div className="flex flex-col items-center justify-center">
                 <div className="text-xs font-bold text-slate-400 mb-2 flex items-center gap-1">
                   <Smartphone className="w-4 h-4 text-slate-400" />
-                  Resident Mobile Lock Screen Preview
+                  Mobile lock screen preview
                 </div>
 
                 <div className="w-full max-w-[280px] bg-black border border-slate-800 rounded-sm p-3 relative overflow-hidden text-slate-100 min-h-[440px] flex flex-col justify-between">
@@ -256,12 +256,12 @@ export const SmsAlertModal: React.FC<SmsAlertModalProps> = ({
             /* Sent Log Tab */
             <div className="space-y-3">
               <div className="flex items-center justify-between pb-2 border-b border-slate-800 text-xs">
-                <span className="font-bold text-slate-300">Simulated Alert Dispatch History ({sentAlerts.length})</span>
-                <span className="text-slate-500">Live Research Demo Log</span>
+                <span className="font-bold text-slate-300">Simulated alert dispatch history ({sentAlerts.length})</span>
+                <span className="text-slate-500">Demo log</span>
               </div>
 
               {sentAlerts.length === 0 ? (
-                <div className="p-8 text-center text-slate-500 text-xs">No alerts dispatches recorded yet today.</div>
+                <div className="p-8 text-center text-slate-500 text-xs">No alert dispatches recorded yet today.</div>
               ) : (
                 <div className="space-y-2.5">
                   {sentAlerts.map((alert) => (
@@ -286,8 +286,8 @@ export const SmsAlertModal: React.FC<SmsAlertModalProps> = ({
                       </p>
 
                       <div className="flex items-center justify-between text-[10px] text-slate-500 pt-1">
-                        <span>Recipients Reached: <strong className="font-mono">{alert.recipientCount.toLocaleString()}</strong> mobile devices</span>
-                        <span>Status: <strong className="text-emerald-400">Delivered (Simulated)</strong></span>
+                        <span>Recipients reached: <strong className="font-mono">{alert.recipientCount.toLocaleString()}</strong> mobile devices</span>
+                        <span>Status: <strong className="text-emerald-400">Delivered (simulated)</strong></span>
                       </div>
                     </div>
                   ))}
