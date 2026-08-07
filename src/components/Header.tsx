@@ -9,13 +9,14 @@ import {
   UserPlus,
   Menu,
   X,
+  FileCheck2,
 } from 'lucide-react';
 import { PRESET_SCENARIOS } from '../data/dhakaData';
 import { APP_METADATA } from '../config/appConfig';
 
 interface HeaderProps {
-  activeTab: 'dashboard' | 'methodology';
-  onSelectTab: (tab: 'dashboard' | 'methodology') => void;
+  activeTab: 'dashboard' | 'methodology' | 'validation';
+  onSelectTab: (tab: 'dashboard' | 'methodology' | 'validation') => void;
   selectedScenarioId: string;
   onSelectScenario: (scenarioId: string) => void;
   onOpenCsvModal: () => void;
@@ -100,6 +101,17 @@ export const Header: React.FC<HeaderProps> = ({
                 <BookOpen className="w-3.5 h-3.5 text-blue-400" />
                 <span>Methodology & data sources</span>
               </button>
+              <button
+                onClick={() => onSelectTab('validation')}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-sm text-xs font-semibold transition-colors ${
+                  activeTab === 'validation'
+                    ? 'bg-[#1F3A5F] text-white border border-[#E3E1DA]/30'
+                    : 'text-slate-400 hover:text-slate-200 hover:bg-slate-900'
+                }`}
+              >
+                <FileCheck2 className="w-3.5 h-3.5 text-emerald-400" />
+                <span>Formula validation</span>
+              </button>
             </nav>
 
             {/* Action Bar & Controls */}
@@ -172,19 +184,19 @@ export const Header: React.FC<HeaderProps> = ({
         {isMobileMenuOpen && (
           <div className="lg:hidden mt-3 pt-3 border-t border-slate-800 space-y-3">
             {/* Navigation Tabs */}
-            <div className="grid grid-cols-2 gap-2 bg-slate-950 p-1 border border-slate-800 rounded-sm">
+            <div className="grid grid-cols-3 gap-1.5 bg-slate-950 p-1 border border-slate-800 rounded-sm">
               <button
                 onClick={() => {
                   onSelectTab('dashboard');
                   setIsMobileMenuOpen(false);
                 }}
-                className={`flex items-center justify-center gap-1.5 px-3 py-2 rounded-sm text-xs font-semibold transition-colors ${
+                className={`flex items-center justify-center gap-1.5 px-2 py-2 rounded-sm text-[11px] sm:text-xs font-semibold transition-colors ${
                   activeTab === 'dashboard'
                     ? 'bg-[#1F3A5F] text-white border border-[#E3E1DA]/30'
                     : 'text-slate-400 hover:text-slate-200'
                 }`}
               >
-                <MapPin className="w-3.5 h-3.5 text-emerald-400" />
+                <MapPin className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
                 <span>Dashboard</span>
               </button>
               <button
@@ -192,14 +204,28 @@ export const Header: React.FC<HeaderProps> = ({
                   onSelectTab('methodology');
                   setIsMobileMenuOpen(false);
                 }}
-                className={`flex items-center justify-center gap-1.5 px-3 py-2 rounded-sm text-xs font-semibold transition-colors ${
+                className={`flex items-center justify-center gap-1.5 px-2 py-2 rounded-sm text-[11px] sm:text-xs font-semibold transition-colors ${
                   activeTab === 'methodology'
                     ? 'bg-[#1F3A5F] text-white border border-[#E3E1DA]/30'
                     : 'text-slate-400 hover:text-slate-200'
                 }`}
               >
-                <BookOpen className="w-3.5 h-3.5 text-blue-400" />
+                <BookOpen className="w-3.5 h-3.5 text-blue-400 shrink-0" />
                 <span>Methodology</span>
+              </button>
+              <button
+                onClick={() => {
+                  onSelectTab('validation');
+                  setIsMobileMenuOpen(false);
+                }}
+                className={`flex items-center justify-center gap-1.5 px-2 py-2 rounded-sm text-[11px] sm:text-xs font-semibold transition-colors ${
+                  activeTab === 'validation'
+                    ? 'bg-[#1F3A5F] text-white border border-[#E3E1DA]/30'
+                    : 'text-slate-400 hover:text-slate-200'
+                }`}
+              >
+                <FileCheck2 className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                <span>Validation</span>
               </button>
             </div>
 

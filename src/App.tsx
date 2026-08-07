@@ -11,6 +11,7 @@ import { AreaListView } from './components/AreaListView';
 import { AreaDetailPanel } from './components/AreaDetailPanel';
 import { SimulationControls } from './components/SimulationControls';
 import { MethodologyPage } from './components/MethodologyPage';
+import { ValidationPage } from './components/ValidationPage';
 import { CsvDataModal } from './components/CsvDataModal';
 import { CriticalRiskToast } from './components/CriticalRiskToast';
 import { SmsAlertModal } from './components/SmsAlertModal';
@@ -20,7 +21,7 @@ import { SummaryStatsSkeleton, MapSkeleton, DetailPanelSkeleton } from './compon
 import { SectionErrorBoundary } from './components/SectionErrorBoundary';
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState<'dashboard' | 'methodology'>('dashboard');
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'methodology' | 'validation'>('dashboard');
   const [areasData, setAreasData] = useState<DhakaArea[]>(INITIAL_DHAKA_AREAS);
   const [selectedScenarioId, setSelectedScenarioId] = useState<string>('current-jul');
   const [weights, setWeights] = useState<ModelWeights>(DEFAULT_WEIGHTS);
@@ -191,6 +192,10 @@ export default function App() {
         {activeTab === 'methodology' ? (
           <SectionErrorBoundary title="Methodology Section Error">
             <MethodologyPage onBackToDashboard={() => setActiveTab('dashboard')} />
+          </SectionErrorBoundary>
+        ) : activeTab === 'validation' ? (
+          <SectionErrorBoundary title="Formula Validation Section Error">
+            <ValidationPage onBackToDashboard={() => setActiveTab('dashboard')} />
           </SectionErrorBoundary>
         ) : (
           <>
