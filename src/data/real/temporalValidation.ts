@@ -2,6 +2,22 @@ import { HISTORICAL_DENGUE_DATA } from './dengueCases';
 import { getRainfallForArea } from './rainfall';
 import { HISTORICAL_POPULATION_DATA } from './population';
 
+/** Operational threshold of >=400 reported dengue cases per area-month for high-surge classification */
+export const HIGH_RISK_CASE_THRESHOLD = 400;
+
+export interface TemporalObservation {
+  areaId: string;
+  area: string;
+  featureYear: number;
+  featureMonth: number;
+  targetYear: number;
+  targetMonth: number;
+  laggedCases_t1: number;
+  laggedRainfall_t1: number;
+  populationDensity: number;
+  targetCases_t0: number;
+}
+
 export interface TemporalEvaluationRow {
   areaId: string;
   area: string;
@@ -12,7 +28,7 @@ export interface TemporalEvaluationRow {
   populationDensity: number;    // Feature: Census population density
   targetCases_t0: number;       // TARGET: Actual dengue cases at period t
   predictedRisk: number;        // Output: Model predicted risk score [0.00, 1.00]
-  targetHighRisk: boolean;      // Target >= surge threshold (e.g. 400 cases)
+  targetHighRisk: boolean;      // Target >= operational surge threshold (400 cases)
   predictedHighRisk: boolean;   // predictedRisk >= 0.50
   hit: boolean;                 // targetHighRisk === predictedHighRisk
 }
@@ -49,6 +65,9 @@ export interface TemporalValidationResult {
   featuresUsed: string[];
   totalTrainRecords: number;
   totalTestRecords: number;
+  areasEvaluatedCount: number;
+  targetMonthsCount: number;
+  sampleSizeInterpretation: string;
   normalizationParamsTrain: NormalizationParams;
   metrics: ValidationMetrics | null;
   testRows: TemporalEvaluationRow[];
@@ -61,51 +80,41 @@ export interface TemporalValidationResult {
 }
 
 /**
-  * Executes a chronologically split, out-of-sample temporal validation.
-  * Training Period: 2023 (2023-07 target evaluated using 2023-06 lagged features)
-  * Test Period: 2024 (2024-07 target evaluated using 2024-06 lagged features)
-  * Target Leakage Prevention: Period t dengue cases are NEVER used as model inputs for period t risk prediction.
-  * Train-Only Normalization: Min-Max bounds are derived strictly from the 2023 Training Set.
-  */
-export function evaluateTemporalModel(
-  weights: { cases: number; rainfall: number; density: number },
-  modelName: string,
-  modelDescription: string,
-  featuresUsed: string[]
-): TemporalValidationResult {
-  // Step 1: Construct Pairs (Feature at t-1 -> Target at t)
-  const allPairs: {
-    areaId: string;
-    area: string;
-    targetYear: number;
-    targetMonth: number;
-    laggedCases_t1: number;
-    laggedRainfall_t1: number;
-    populationDensity: number;
-    targetCases_t0: number;
-  }[] = [];
+ * Constructs all eligible consecutive temporal pairs (period t-1 -> period t)
+ * across all available areas and months where both periods exist in historical records.
+ */
+export function constructTemporalObservations(): TemporalObservation[] {
+  const pairs: TemporalObservation[] = [];
 
-  // Find target records at month t (e.g. month 7 in 2023 and 2024)
   HISTORICAL_DENGUE_DATA.forEach((targetRecord) => {
-    // Only process target periods (month 7)
-    if (targetRecord.month !== 7) return;
+    if (targetRecord.cases === null || targetRecord.cases === undefined) return;
 
-    // Find lagged dengue case record at month t-1 (month 6 of same year)
+    // Determine preceding feature month (t-1)
+    let featureYear = targetRecord.year;
+    let featureMonth = targetRecord.month - 1;
+    if (featureMonth === 0) {
+      featureMonth = 12;
+      featureYear = targetRecord.year - 1;
+    }
+
+    // Find lagged dengue case record at month t-1
     const laggedDengue = HISTORICAL_DENGUE_DATA.find(
-      (d) => d.areaId === targetRecord.areaId && d.year === targetRecord.year && d.month === targetRecord.month - 1
+      (d) => d.areaId === targetRecord.areaId && d.year === featureYear && d.month === featureMonth
     );
 
     // Find rainfall record for preceding month t-1
-    const rainfallRecord = getRainfallForArea(targetRecord.areaId, targetRecord.year, targetRecord.month - 1);
+    const rainfallRecord = getRainfallForArea(targetRecord.areaId, featureYear, featureMonth);
 
     // Find population density
     const popRecord = HISTORICAL_POPULATION_DATA.find((p) => p.areaId === targetRecord.areaId);
 
-    // Require valid lagged features and target
+    // Require valid lagged features and target for fair multi-model comparison
     if (laggedDengue && laggedDengue.cases !== null && rainfallRecord && popRecord) {
-      allPairs.push({
+      pairs.push({
         areaId: targetRecord.areaId,
         area: targetRecord.area,
+        featureYear,
+        featureMonth,
         targetYear: targetRecord.year,
         targetMonth: targetRecord.month,
         laggedCases_t1: laggedDengue.cases,
@@ -116,21 +125,49 @@ export function evaluateTemporalModel(
     }
   });
 
-  // Split pairs into Training (2023) and Test (2024)
-  const trainPairs = allPairs.filter((p) => p.targetYear === 2023);
-  const testPairs = allPairs.filter((p) => p.targetYear === 2024);
+  return pairs;
+}
+
+/**
+ * Executes a chronologically split, out-of-sample temporal validation.
+ * Training Period: 2023 historical records (Period t-1 lagged features -> Period t target)
+ * Test Period: 2024 held-out historical records (Period t-1 lagged features -> Period t target)
+ * Target Leakage Prevention: Period t dengue cases are NEVER used as model inputs for period t risk prediction.
+ * Train-Only Normalization: Min-Max bounds are derived strictly from the 2023 Training Set.
+ */
+export function evaluateTemporalModel(
+  weights: { cases: number; rainfall: number; density: number },
+  modelName: string,
+  modelDescription: string,
+  featuresUsed: string[]
+): TemporalValidationResult {
+  const allPairs = constructTemporalObservations();
+
+  // Chronological Split: Training (<= 2023) and Held-Out Test (>= 2024)
+  const trainPairs = allPairs.filter((p) => p.targetYear <= 2023);
+  const testPairs = allPairs.filter((p) => p.targetYear >= 2024);
+
+  const uniqueAreas = new Set(testPairs.map((p) => p.areaId));
+  const uniqueTargetMonths = new Set(testPairs.map((p) => `${p.targetYear}-${p.targetMonth}`));
+
+  const sampleSizeInterpretation = testPairs.length < 30
+    ? 'Pilot evaluation — limited sample size.'
+    : 'Preliminary out-of-sample evaluation.';
 
   if (trainPairs.length === 0 || testPairs.length === 0) {
     return {
       isValid: false,
       modelName,
       modelDescription,
-      trainingPeriod: '2023',
-      testPeriod: '2024',
+      trainingPeriod: '2023 Historical Period',
+      testPeriod: '2024 Held-Out Test Period',
       targetDescription: 'Observed Dengue Cases (Month t)',
       featuresUsed,
       totalTrainRecords: trainPairs.length,
       totalTestRecords: testPairs.length,
+      areasEvaluatedCount: uniqueAreas.size,
+      targetMonthsCount: uniqueTargetMonths.size,
+      sampleSizeInterpretation,
       normalizationParamsTrain: { minCases: 0, maxCases: 1, minRainfall: 0, maxRainfall: 1, minDensity: 0, maxDensity: 1 },
       metrics: null,
       testRows: [],
@@ -143,7 +180,7 @@ export function evaluateTemporalModel(
     };
   }
 
-  // Step 2: Compute Normalization Parameters ON TRAINING SET ONLY (2023)
+  // Step 2: Compute Normalization Parameters ON TRAINING SET ONLY (<= 2023)
   const minCases = Math.min(...trainPairs.map((r) => r.laggedCases_t1));
   const maxCases = Math.max(...trainPairs.map((r) => r.laggedCases_t1));
   const caseRange = maxCases - minCases || 1;
@@ -165,24 +202,21 @@ export function evaluateTemporalModel(
     maxDensity,
   };
 
-  // Derive high-risk surge threshold from training targets (e.g. 400 cases)
-  const surgeThresholdTrain = 400;
-
-  // Step 3: Evaluate Model Predictions on HELD-OUT TEST SET ONLY (2024)
+  // Step 3: Evaluate Model Predictions on HELD-OUT TEST SET ONLY (>= 2024)
   const evaluatedTestRows: TemporalEvaluationRow[] = testPairs.map((pair) => {
     // Normalize test features USING TRAINING NORMALIZATION PARAMETERS
     const normCases = Math.max(0, Math.min(1, (pair.laggedCases_t1 - minCases) / caseRange));
     const normRain = Math.max(0, Math.min(1, (pair.laggedRainfall_t1 - minRainfall) / rainRange));
     const normDens = Math.max(0, Math.min(1, (pair.populationDensity - minDensity) / densityRange));
 
-    // Calculate predicted risk score
+    // Calculate predicted risk score using expert weights
     const risk =
       weights.cases * normCases +
       weights.rainfall * normRain +
       weights.density * normDens;
 
     const predictedRisk = Math.round(risk * 100) / 100;
-    const targetHighRisk = pair.targetCases_t0 >= surgeThresholdTrain;
+    const targetHighRisk = pair.targetCases_t0 >= HIGH_RISK_CASE_THRESHOLD;
     const predictedHighRisk = predictedRisk >= 0.50;
 
     return {
@@ -253,12 +287,15 @@ export function evaluateTemporalModel(
     isValid: true,
     modelName,
     modelDescription,
-    trainingPeriod: '2023-07 (Evaluated on 2023-06 Lagged Features)',
-    testPeriod: '2024-07 (Evaluated on 2024-06 Lagged Features)',
-    targetDescription: 'Actual Observed Dengue Cases (Month t)',
+    trainingPeriod: '2023 Historical Period (Period t-1 Features → Period t Targets)',
+    testPeriod: '2024 Held-Out Test Period (Period t-1 Features → Period t Targets)',
+    targetDescription: 'Actual Observed Dengue Cases (Period t)',
     featuresUsed,
     totalTrainRecords: trainPairs.length,
     totalTestRecords: evaluatedTestRows.length,
+    areasEvaluatedCount: uniqueAreas.size,
+    targetMonthsCount: uniqueTargetMonths.size,
+    sampleSizeInterpretation,
     normalizationParamsTrain: trainNormalizationParams,
     metrics: {
       precision: precision !== null ? Math.round(precision * 100) / 100 : null,
@@ -283,7 +320,7 @@ export function evaluateTemporalModel(
 }
 
 /**
- * Runs the three standard models through the temporal validation pipeline
+ * Runs the three standard risk models through the temporal validation pipeline
  */
 export function runTemporalValidationSuite() {
   const modelA = evaluateTemporalModel(
@@ -295,14 +332,14 @@ export function runTemporalValidationSuite() {
 
   const modelB = evaluateTemporalModel(
     { cases: 0.65, rainfall: 0.35, density: 0.0 },
-    'Model B: Cases + Rainfall',
+    'Model B: Cases + Rainfall Baseline',
     'Risk = 0.65 × Lagged Cases (t-1) + 0.35 × Lagged Rainfall (t-1)',
     ['Lagged Dengue Cases (t-1)', 'Lagged Rainfall (t-1)']
   );
 
   const modelC = evaluateTemporalModel(
     { cases: 0.50, rainfall: 0.30, density: 0.20 },
-    'Proposed Expert Model',
+    'Proposed Expert-Weighted Model',
     'Risk = 0.50 × Lagged Cases (t-1) + 0.30 × Lagged Rain (t-1) + 0.20 × Density',
     ['Lagged Dengue Cases (t-1)', 'Lagged Rainfall (t-1)', 'Population Density']
   );
@@ -313,3 +350,4 @@ export function runTemporalValidationSuite() {
     modelC,
   };
 }
+

@@ -59,33 +59,33 @@ export const ValidationPage: React.FC<ValidationPageProps> = ({ onBackToDashboar
           <div className="flex items-center gap-2 border-b border-slate-800 pb-2">
             <Clock className="w-4 h-4 text-emerald-400" />
             <h3 className="font-bold text-xs uppercase tracking-wider text-white">
-              Validation Strategy & Train/Test Architecture
+              Validation Strategy & Chronological Train/Test Split
             </h3>
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs font-mono">
             <div className="bg-slate-950 p-2.5 rounded border border-slate-800">
-              <span className="text-[10px] text-slate-400 uppercase font-sans block">Training Period</span>
-              <span className="font-bold text-emerald-400 text-xs">2023 (Month 7)</span>
-              <span className="text-[9px] text-slate-500 block">Using M6 Features</span>
+              <span className="text-[10px] text-slate-400 uppercase font-sans block">Training Observations</span>
+              <span className="font-bold text-emerald-400 text-xs">{modelC.totalTrainRecords} Records</span>
+              <span className="text-[9px] text-slate-500 block">2023 Period t-1 &rarr; t</span>
             </div>
             <div className="bg-slate-950 p-2.5 rounded border border-slate-800">
-              <span className="text-[10px] text-slate-400 uppercase font-sans block">Held-Out Test Period</span>
-              <span className="font-bold text-cyan-400 text-xs">2024 (Month 7)</span>
-              <span className="text-[9px] text-slate-500 block">Using M6 Features</span>
+              <span className="text-[10px] text-slate-400 uppercase font-sans block">Held-Out Test Observations</span>
+              <span className="font-bold text-cyan-400 text-xs">{modelC.totalTestRecords} Records</span>
+              <span className="text-[9px] text-slate-500 block">2024 Period t-1 &rarr; t</span>
             </div>
             <div className="bg-slate-950 p-2.5 rounded border border-slate-800">
-              <span className="text-[10px] text-slate-400 uppercase font-sans block">Evaluation Target</span>
-              <span className="font-bold text-amber-300 text-xs">Target Cases (Month t)</span>
-              <span className="text-[9px] text-slate-500 block">Future Outcome</span>
+              <span className="text-[10px] text-slate-400 uppercase font-sans block">Areas Evaluated</span>
+              <span className="font-bold text-amber-300 text-xs">{modelC.areasEvaluatedCount} Thanas</span>
+              <span className="text-[9px] text-slate-500 block">Identical Pairs</span>
             </div>
             <div className="bg-slate-950 p-2.5 rounded border border-slate-800">
-              <span className="text-[10px] text-slate-400 uppercase font-sans block">Target Leakage</span>
-              <span className="font-bold text-emerald-400 text-xs">Prevented</span>
-              <span className="text-[9px] text-slate-500 block">Inputs &lt; Target t</span>
+              <span className="text-[10px] text-slate-400 uppercase font-sans block">Target Months</span>
+              <span className="font-bold text-blue-400 text-xs">{modelC.targetMonthsCount} Period(s)</span>
+              <span className="text-[9px] text-slate-500 block">Evaluated Pairs</span>
             </div>
           </div>
           <div className="text-[11px] text-slate-400 bg-slate-950/70 p-2.5 rounded border border-slate-800/80 leading-relaxed font-sans">
-            <strong>Methodology Note:</strong> Predictions are evaluated chronologically using information available <em>before</em> the prediction period. Target-period dengue observations are excluded from predictive features to prevent data leakage. Normalization min/max parameters are fitted exclusively on the 2023 training set.
+            <strong>Methodology Note:</strong> Predictions are evaluated chronologically using information available <em>before</em> the target prediction period. Target-period dengue observations are excluded from predictive features to prevent data leakage. Normalization min/max parameters are fitted exclusively on the 2023 training set. Surge cutoff is a pre-defined operational threshold of &ge;400 reported dengue cases per area-month.
           </div>
         </div>
 
@@ -118,6 +118,21 @@ export const ValidationPage: React.FC<ValidationPageProps> = ({ onBackToDashboar
         </div>
       </div>
 
+      {/* SAMPLE SIZE LIMITATION NOTICE */}
+      {modelC.totalTestRecords < 30 && (
+        <div className="bg-amber-950/30 border border-amber-500/40 rounded-sm p-3.5 text-amber-200 text-xs flex items-start gap-2.5">
+          <Info className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
+          <div className="space-y-0.5">
+            <span className="font-bold uppercase tracking-wider text-amber-300 block text-[11px]">
+              {modelC.sampleSizeInterpretation}
+            </span>
+            <p className="text-amber-200/90 leading-relaxed font-sans">
+              Limited historical area-month observations currently restrict the statistical strength of the validation. Results should be interpreted as a pilot evaluation pending additional verified surveillance data.
+            </p>
+          </div>
+        </div>
+      )}
+
       {/* SECTION 1: Out-of-Sample Model C Performance Metrics */}
       <div className="bg-slate-900 border border-slate-800 rounded-sm p-5 space-y-6">
         <div className="flex items-center justify-between pb-3 border-b border-slate-800 flex-wrap gap-2">
@@ -127,7 +142,7 @@ export const ValidationPage: React.FC<ValidationPageProps> = ({ onBackToDashboar
             </div>
             <div>
               <h2 className="text-base font-bold text-white">
-                Held-Out Out-of-Sample Performance (Proposed Expert Model)
+                Held-Out Out-of-Sample Performance (Proposed Expert-Weighted Model)
               </h2>
               <p className="text-xs text-slate-400">
                 Evaluation on unseen 2024 test period records using 2023 training-derived normalization parameters
@@ -135,11 +150,11 @@ export const ValidationPage: React.FC<ValidationPageProps> = ({ onBackToDashboar
             </div>
           </div>
           <span className="px-2.5 py-1 bg-blue-950/60 text-blue-300 border border-blue-500/40 rounded-sm text-xs font-mono font-bold">
-            Evaluated Test Records: {modelC.totalTestRecords} Thana-Months
+            Test Records: {modelC.totalTestRecords} Thana-Months
           </span>
         </div>
 
-        {modelC.isValid && modelC.metrics ? (
+        {modelC.isValid && modelC.metrics && modelC.totalTestRecords > 0 ? (
           <div className="space-y-6">
             {/* Metric KPI Cards */}
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
@@ -193,7 +208,7 @@ export const ValidationPage: React.FC<ValidationPageProps> = ({ onBackToDashboar
               <div className="bg-slate-950 p-4 rounded-sm border border-slate-800 space-y-3">
                 <h3 className="text-xs font-bold text-slate-200 uppercase tracking-wider flex items-center gap-1.5">
                   <Target className="w-4 h-4 text-blue-400" />
-                  Classification Confusion Matrix (Test Set: 2024)
+                  Classification Confusion Matrix (Held-Out Test Period)
                 </h3>
                 <div className="grid grid-cols-2 gap-2 text-center text-xs font-mono pt-1">
                   <div className="bg-emerald-950/60 border border-emerald-500/40 p-2.5 rounded">
@@ -222,7 +237,7 @@ export const ValidationPage: React.FC<ValidationPageProps> = ({ onBackToDashboar
               {/* Classification Definitions */}
               <div className="bg-slate-950 p-4 rounded-sm border border-slate-800 space-y-2 text-xs text-slate-300 leading-relaxed">
                 <h3 className="font-bold text-white text-xs uppercase tracking-wider mb-2">
-                  Metric Formulations & Thresholds
+                  Metric Formulations & Operational Thresholds
                 </h3>
                 <p>
                   <strong className="text-emerald-400">Precision = TP / (TP + FP):</strong> Measures what proportion of predicted high-risk zones actually experienced a high case surge (&ge;400 cases).
@@ -231,7 +246,7 @@ export const ValidationPage: React.FC<ValidationPageProps> = ({ onBackToDashboar
                   <strong className="text-emerald-400">Recall = TP / (TP + FN):</strong> Measures the model&apos;s sensitivity in capturing actual high-surge outbreaks.
                 </p>
                 <p>
-                  <strong className="text-blue-400">Surge Threshold:</strong> High-risk classification cutoff set to &ge;400 observed dengue cases, derived from 2023 training set distribution.
+                  <strong className="text-blue-400">Pre-defined Operational Threshold:</strong> A fixed cutoff of &ge;400 reported dengue cases per area-month is used for pilot high-surge classification (not tuned on test data).
                 </p>
               </div>
             </div>

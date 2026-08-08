@@ -126,15 +126,40 @@ export const DataQualityPanel: React.FC<DataQualityPanelProps> = ({
       </div>
 
       {/* Primary Data Sources List */}
-      <div className="pt-2 border-t border-slate-800/80 text-[11px] text-slate-400 space-y-2 font-sans">
-        <div className="flex items-center justify-between">
+      <div className="pt-2 border-t border-slate-800/80 text-[11px] text-slate-400 space-y-2.5 font-sans">
+        <div className="flex items-center justify-between flex-wrap gap-1">
           <span className="font-bold text-slate-300 uppercase tracking-wider block text-[10px]">
-            Attributed Data Sources & Provenance Status:
+            Attributed Data Sources, Provenance & Verification Status:
           </span>
           <span className="text-[10px] text-amber-400 font-mono">
-            Verification: Partially Verified (Reports cited; micro-data extracted)
+            Overall Verification: Partially Verified (Attributed reports cited; micro-data extracted)
           </span>
         </div>
+
+        {/* 3-Dimensional Quality Audit Summary */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-[10px] font-mono bg-slate-900 p-2.5 rounded border border-slate-800">
+          <div>
+            <span className="text-slate-400 block uppercase font-sans font-semibold">1. Data Completeness</span>
+            <span className="text-emerald-400 font-bold">{completionRate}% Present ({summary.completeRecords}/{summary.totalRecords} Aligned)</span>
+          </div>
+          <div>
+            <span className="text-slate-400 block uppercase font-sans font-semibold">2. Source Provenance</span>
+            <span className="text-blue-300 font-bold">DGHS, BMD & BBS Official Records</span>
+          </div>
+          <div>
+            <span className="text-slate-400 block uppercase font-sans font-semibold">3. Verification Status</span>
+            <span className="text-amber-300 font-bold">Partially Verified (Cited)</span>
+          </div>
+        </div>
+
+        {/* Rainfall Proxy Disclosure */}
+        <div className="bg-slate-900/60 p-2 rounded border border-slate-800/80 text-[10px] text-slate-400 flex items-start gap-1.5 font-mono">
+          <CloudRain className="w-3.5 h-3.5 text-blue-400 shrink-0 mt-0.5" />
+          <span>
+            <strong>Rainfall Proxy Disclosure:</strong> Agargaon BMD station (Station ID 41923) precipitation is used as a central Dhaka rainfall proxy and mapped across study areas. Sub-thana microclimatic rain variation is not independently gauged per thana.
+          </span>
+        </div>
+
         <ul className="space-y-1.5 divide-y divide-slate-900">
           {summary.sources.map((src) => (
             <li key={src.id} className="pt-1.5 first:pt-0 leading-relaxed flex flex-col sm:flex-row sm:items-center justify-between gap-1">
