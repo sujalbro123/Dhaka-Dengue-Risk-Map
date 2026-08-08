@@ -4,6 +4,24 @@ import { MODEL_CONFIG } from '../config/appConfig';
 export const DEFAULT_WEIGHTS: ModelWeights = MODEL_CONFIG.defaultWeights;
 export const DEFAULT_MODIFIERS: SimulationModifiers = MODEL_CONFIG.defaultModifiers;
 
+/**
+ * Computes normalized risk score (0.0 to 1.0) from individual 0-1 normalized factors.
+ * Each input (normCases, normRainfall, normDensity) MUST be independently min-max normalized
+ * to [0, 1] BEFORE calling this function or applying weights (0.5 / 0.3 / 0.2).
+ */
+export function calculateRiskScore(
+  normCases: number,
+  normRainfall: number,
+  normDensity: number,
+  weights: ModelWeights = DEFAULT_WEIGHTS
+): number {
+  const totalWeight = weights.casesWeight + weights.rainfallWeight + weights.densityWeight || 1.0;
+  const weightedCases = normCases * weights.casesWeight;
+  const weightedRainfall = normRainfall * weights.rainfallWeight;
+  const weightedDensity = normDensity * weights.densityWeight;
+  return (weightedCases + weightedRainfall + weightedDensity) / totalWeight;
+}
+
 export function calculateAreaRisks(
   areas: DhakaArea[],
   weights: ModelWeights = DEFAULT_WEIGHTS,
@@ -79,13 +97,13 @@ export function calculateAreaRisks(
     const weightedDensity = normDensity * weights.densityWeight;
 
     // Total current risk score (0.0 to 1.0)
-    const rawRiskScore = (weightedCases + weightedRainfall + weightedDensity) / totalWeight;
+    const rawRiskScore = calculateRiskScore(normCases, normRainfall, normDensity, weights);
     const riskScore100 = Math.round(rawRiskScore * 100);
 
     // Last Week Risk Score Calculation
     const lwNormCases = Math.max(0, Math.min(1, (adj.lastWeekCases - minCases) / caseRange));
     const lwNormRainfall = Math.max(0, Math.min(1, (adj.lastWeekRain - minRain) / rainRange));
-    const lwRawScore = (lwNormCases * weights.casesWeight + lwNormRainfall * weights.rainfallWeight + normDensity * weights.densityWeight) / totalWeight;
+    const lwRawScore = calculateRiskScore(lwNormCases, lwNormRainfall, normDensity, weights);
     const lastWeekRiskScore = Math.round(lwRawScore * 100);
 
     // Trend determination
@@ -102,7 +120,7 @@ export function calculateAreaRisks(
     // Prior Year Risk Score Calculation
     const pyNormCases = Math.max(0, Math.min(1, (adj.priorYearCases - minCases) / caseRange));
     const pyNormRainfall = Math.max(0, Math.min(1, (adj.priorYearRain - minRain) / rainRange));
-    const pyRawScore = (pyNormCases * weights.casesWeight + pyNormRainfall * weights.rainfallWeight + normDensity * weights.densityWeight) / totalWeight;
+    const pyRawScore = calculateRiskScore(pyNormCases, pyNormRainfall, normDensity, weights);
     const priorYearRiskScore = Math.round(pyRawScore * 100);
 
     // Year over year comparison percentage
