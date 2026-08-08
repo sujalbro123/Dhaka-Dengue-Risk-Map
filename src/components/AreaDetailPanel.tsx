@@ -23,6 +23,7 @@ import {
   TrendingUp,
   Award,
   Calendar,
+  Info,
 } from 'lucide-react';
 
 interface AreaDetailPanelProps {
@@ -79,20 +80,55 @@ export const AreaDetailPanel: React.FC<AreaDetailPanelProps> = React.memo(({
           </div>
         </div>
 
-        {/* Risk Score Highlight Badge & Trend Arrow */}
-        <div className={`p-3.5 rounded-sm border ${badge.bg} ${badge.border} text-right min-w-[150px] flex flex-col justify-between`}>
-          <div>
-            <div className="text-[10px] uppercase tracking-wider font-bold text-slate-400">
-              Current risk score
+        {/* Risk Score Highlight Badge & Methodology Card */}
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+          {/* Methodology Disclosure Card */}
+          <div className="bg-slate-950 p-2.5 rounded-sm border border-slate-800 text-left max-w-xs space-y-1">
+            <div className="flex items-center gap-1.5 text-[10px] font-bold text-amber-300 uppercase tracking-wider">
+              <Info className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+              <span>Methodology Card</span>
             </div>
-            <div className={`text-2xl sm:text-3xl font-extrabold font-mono ${badge.text} flex items-center justify-end gap-1.5`}>
-              <span>{area.riskScore100}</span>
-              <span className="text-xs font-normal text-slate-400">/100</span>
+            <div className="text-[11px] font-semibold text-slate-200">
+              Relative Risk Index: <span className="font-mono text-amber-400 font-bold">{area.riskScore100}/100</span>
+            </div>
+            <p className="text-[10px] text-slate-400 leading-tight">
+              Based on normalized dengue, rainfall and population-density signals.
+            </p>
+            <p className="text-[9px] text-slate-500 italic pt-0.5 border-t border-slate-800/60">
+              *Risk score is a relative index, not a probability of infection.
+            </p>
+          </div>
 
-              {/* Trend Arrow */}
+          {/* Risk Score Badge */}
+          <div className={`p-3.5 rounded-sm border ${badge.bg} ${badge.border} text-right min-w-[150px] flex flex-col justify-between shrink-0`}>
+            <div>
+              <div className="text-[10px] uppercase tracking-wider font-bold text-slate-400">
+                Current Risk Score
+              </div>
+              <div className={`text-2xl sm:text-3xl font-extrabold font-mono ${badge.text} flex items-center justify-end gap-1.5`}>
+                <span>{area.riskScore100}</span>
+                <span className="text-xs font-normal text-slate-400">/100</span>
+
+                {/* Trend Arrow */}
+                <span
+                  title={`Last week score: ${area.lastWeekRiskScore}`}
+                  className={`text-lg font-black ${
+                    area.trend === 'rising'
+                      ? 'text-red-400'
+                      : area.trend === 'falling'
+                      ? 'text-emerald-400'
+                      : 'text-slate-400'
+                  }`}
+                >
+                  {area.trend === 'rising' ? '↑' : area.trend === 'falling' ? '↓' : '→'}
+                </span>
+              </div>
+            </div>
+
+            <div className="mt-1 pt-1 border-t border-slate-800/80 flex items-center justify-between text-[11px]">
+              <span className="text-slate-400 font-medium">Weekly trend:</span>
               <span
-                title={`Last week score: ${area.lastWeekRiskScore}`}
-                className={`text-lg font-black ${
+                className={`font-bold font-mono ${
                   area.trend === 'rising'
                     ? 'text-red-400'
                     : area.trend === 'falling'
@@ -100,28 +136,13 @@ export const AreaDetailPanel: React.FC<AreaDetailPanelProps> = React.memo(({
                     : 'text-slate-400'
                 }`}
               >
-                {area.trend === 'rising' ? '↑' : area.trend === 'falling' ? '↓' : '→'}
+                {area.trend === 'rising'
+                  ? `+${area.trendDelta} pts (rising)`
+                  : area.trend === 'falling'
+                  ? `${area.trendDelta} pts (falling)`
+                  : 'Stable'}
               </span>
             </div>
-          </div>
-
-          <div className="mt-1 pt-1 border-t border-slate-800/80 flex items-center justify-between text-[11px]">
-            <span className="text-slate-400 font-medium">Weekly trend:</span>
-            <span
-              className={`font-bold font-mono ${
-                area.trend === 'rising'
-                  ? 'text-red-400'
-                  : area.trend === 'falling'
-                  ? 'text-emerald-400'
-                  : 'text-slate-400'
-              }`}
-            >
-              {area.trend === 'rising'
-                ? `+${area.trendDelta} pts (rising)`
-                : area.trend === 'falling'
-                ? `${area.trendDelta} pts (falling)`
-                : 'Stable'}
-            </span>
           </div>
         </div>
       </div>
