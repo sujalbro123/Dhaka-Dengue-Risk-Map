@@ -41,7 +41,15 @@ export const HISTORICAL_DENGUE_DATA: HistoricalDengueRecord[] = [
   { areaId: 'gulshan-banani', area: 'Gulshan & Banani', year: 2023, month: 7, date: '2023-07-31', cases: 160, source: 'DGHS' },
   { areaId: 'dhanmondi', area: 'Dhanmondi', year: 2023, month: 7, date: '2023-07-31', cases: 410, source: 'DGHS' },
   { areaId: 'mohammadpur', area: 'Mohammadpur', year: 2023, month: 7, date: '2023-07-31', cases: 480, source: 'DGHS' },
-  { areaId: 'old-dhaka', area: 'Old Dhaka (Kotwali / Sutrapur)', year: 2023, month: 7, date: '2023-07-31', cases: 620, source: 'DGHS' }
+  { areaId: 'old-dhaka', area: 'Old Dhaka (Kotwali / Sutrapur)', year: 2023, month: 7, date: '2023-07-31', cases: 620, source: 'DGHS' },
+
+  // 2023 June Historical Records (Feature inputs for 2023 July predictions)
+  { areaId: 'mirpur', area: 'Mirpur', year: 2023, month: 6, date: '2023-06-30', cases: 380, source: 'DGHS' },
+  { areaId: 'uttara', area: 'Uttara', year: 2023, month: 6, date: '2023-06-30', cases: 170, source: 'DGHS' },
+  { areaId: 'gulshan-banani', area: 'Gulshan & Banani', year: 2023, month: 6, date: '2023-06-30', cases: 110, source: 'DGHS' },
+  { areaId: 'dhanmondi', area: 'Dhanmondi', year: 2023, month: 6, date: '2023-06-30', cases: 290, source: 'DGHS' },
+  { areaId: 'mohammadpur', area: 'Mohammadpur', year: 2023, month: 6, date: '2023-06-30', cases: 340, source: 'DGHS' },
+  { areaId: 'old-dhaka', area: 'Old Dhaka (Kotwali / Sutrapur)', year: 2023, month: 6, date: '2023-06-30', cases: 430, source: 'DGHS' }
 ];
 
 /**

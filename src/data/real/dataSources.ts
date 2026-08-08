@@ -8,9 +8,10 @@ export const REAL_DATA_SOURCES: DataSourceMeta[] = [
     period: '2023 – 2024 (Monthly & Annual Summaries)',
     geographicCoverage: 'Dhaka North City Corporation (DNCC) & Dhaka South City Corporation (DSCC)',
     type: 'observed',
-    sourceUrl: '', // Official government daily press release bulletins & EPI microplanning documents
+    verificationStatus: 'partially_verified',
+    sourceUrl: 'https://old.dghs.gov.bd/index.php/bd/dengue',
     lastUpdated: '2024-11-09',
-    notes: 'Aggregated clinical dengue admission data collected from hospital surveillance networks in DNCC and DSCC zones.'
+    notes: 'Aggregated clinical dengue hospital admission records sourced from DGHS Daily Press Bulletins and EPI microplanning documents.'
   },
   {
     id: 'bmd_rainfall_dhaka',
@@ -19,9 +20,10 @@ export const REAL_DATA_SOURCES: DataSourceMeta[] = [
     period: '2023 – 2024 (Monthly precipitation & 14-day cumulative)',
     geographicCoverage: 'Dhaka Meteorological Station (Agargaon, Station ID: 41923)',
     type: 'observed',
-    sourceUrl: '', // BMD official monthly meteorological records
+    verificationStatus: 'partially_verified',
+    sourceUrl: 'http://live.bmd.gov.bd/',
     lastUpdated: '2024-11-01',
-    notes: 'Rainfall recorded at Agargaon central station, spatially mapped to Dhaka North and South thanas with station distance weighting.'
+    notes: 'Centralized rainfall recorded at Agargaon station (41923) mapped across study thanas. Sub-thana microclimatic rain varies.'
   },
   {
     id: 'dghs_bbs_demographics',
@@ -30,7 +32,8 @@ export const REAL_DATA_SOURCES: DataSourceMeta[] = [
     period: '2024 Baseline',
     geographicCoverage: '20 Dhaka City Corporation Thanas (DNCC & DSCC)',
     type: 'observed',
-    sourceUrl: '',
+    verificationStatus: 'partially_verified',
+    sourceUrl: 'http://www.bbs.gov.bd/',
     lastUpdated: '2024-01-15',
     notes: 'Official census population and land area (sq km) records used to calculate exact population densities.'
   }
@@ -43,7 +46,8 @@ export const DEMO_DATA_SOURCE: DataSourceMeta = {
   period: '2026 Interactive Scenario',
   geographicCoverage: 'Dhaka Metropolitan Area (20 Thanas)',
   type: 'synthetic',
+  verificationStatus: 'synthetic',
   sourceUrl: '',
   lastUpdated: '2026-08-01',
-  notes: 'Synthetic data designed for interactive scenario modeling, UI prototyping, and sensitivity stress-testing. NOT for clinical or official epidemiological interpretation.'
+  notes: 'Synthetic data engineered for interactive scenario modeling, UI prototyping, and sensitivity stress-testing. NOT for clinical or official epidemiological interpretation.'
 };

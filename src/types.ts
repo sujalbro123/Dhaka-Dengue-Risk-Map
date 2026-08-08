@@ -155,6 +155,7 @@ export interface DataSourceMeta {
   period: string;
   geographicCoverage: string;
   type: 'observed' | 'derived' | 'imported' | 'synthetic';
+  verificationStatus?: 'verified' | 'partially_verified' | 'unverified' | 'synthetic';
   sourceUrl?: string;
   lastUpdated: string;
   notes: string;

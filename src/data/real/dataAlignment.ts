@@ -106,138 +106,47 @@ export function computeDataQualitySummary(
   };
 }
 
+import { evaluateTemporalModel, TemporalValidationResult } from './temporalValidation';
+
+export { evaluateTemporalModel, runTemporalValidationSuite } from './temporalValidation';
+
 /**
- * Evaluates historical validation metrics across multi-period records
- * Compares observed cases with model risk scores and outputs Precision, Recall, F1, MAE, RMSE, Pearson r.
+ * Evaluates historical validation metrics across multi-period records using a strict
+ * chronological out-of-sample framework (Target leakage eliminated; normalization parameters
+ * derived strictly from 2023 training set).
  */
 export function evaluateHistoricalValidation(
   modelWeights: { cases: number; rainfall: number; density: number } = { cases: 0.5, rainfall: 0.3, density: 0.2 }
 ) {
-  // Extract historical dataset rows for alignment
-  const evaluationRows: {
-    areaId: string;
-    area: string;
-    year: number;
-    month: number;
-    observedCases: number;
-    rainfallMm: number;
-    density: number;
-    predictedRisk: number;
-    observedHighRisk: boolean;
-    predictedHighRisk: boolean;
-  }[] = [];
-
-  HISTORICAL_DENGUE_DATA.forEach((dengue) => {
-    const rain = getRainfallForArea(dengue.areaId, dengue.year, dengue.month);
-    const pop = HISTORICAL_POPULATION_DATA.find((p) => p.areaId === dengue.areaId);
-
-    if (dengue.cases !== null && rain && pop) {
-      evaluationRows.push({
-        areaId: dengue.areaId,
-        area: dengue.area,
-        year: dengue.year,
-        month: dengue.month,
-        observedCases: dengue.cases,
-        rainfallMm: rain.rainfallMm,
-        density: pop.populationDensity,
-        predictedRisk: 0, // calculated below after normalization
-        observedHighRisk: dengue.cases >= 400, // Threshold for high case surge
-        predictedHighRisk: false,
-      });
-    }
-  });
-
-  if (evaluationRows.length === 0) {
-    return {
-      isValid: false,
-      message: 'Insufficient historical records for statistical validation.',
-      metrics: null,
-      rows: [],
-    };
-  }
-
-  // Calculate Min-Max bounds for normalization across the evaluation set
-  const maxCases = Math.max(...evaluationRows.map((r) => r.observedCases)) || 1;
-  const minCases = Math.min(...evaluationRows.map((r) => r.observedCases));
-  const caseRange = maxCases - minCases || 1;
-
-  const maxRain = Math.max(...evaluationRows.map((r) => r.rainfallMm)) || 1;
-  const minRain = Math.min(...evaluationRows.map((r) => r.rainfallMm));
-  const rainRange = maxRain - minRain || 1;
-
-  const maxDens = Math.max(...evaluationRows.map((r) => r.density)) || 1;
-  const minDens = Math.min(...evaluationRows.map((r) => r.density));
-  const densRange = maxDens - minDens || 1;
-
-  // Compute Risk Scores per row
-  evaluationRows.forEach((row) => {
-    const normCases = (row.observedCases - minCases) / caseRange;
-    const normRain = (row.rainfallMm - minRain) / rainRange;
-    const normDens = (row.density - minDens) / densRange;
-
-    const risk =
-      modelWeights.cases * normCases +
-      modelWeights.rainfall * normRain +
-      modelWeights.density * normDens;
-
-    row.predictedRisk = Math.round(risk * 100) / 100;
-    row.predictedHighRisk = row.predictedRisk >= 0.50;
-  });
-
-  // Calculate Classification Metrics (TP, FP, TN, FN)
-  let tp = 0, fp = 0, tn = 0, fn = 0;
-  let sumAbsErr = 0;
-  let sumSqErr = 0;
-
-  evaluationRows.forEach((r) => {
-    const normActualRisk = (r.observedCases - minCases) / caseRange;
-    const err = Math.abs(r.predictedRisk - normActualRisk);
-    sumAbsErr += err;
-    sumSqErr += err * err;
-
-    if (r.observedHighRisk && r.predictedHighRisk) tp++;
-    else if (!r.observedHighRisk && r.predictedHighRisk) fp++;
-    else if (!r.observedHighRisk && !r.predictedHighRisk) tn++;
-    else if (r.observedHighRisk && !r.predictedHighRisk) fn++;
-  });
-
-  const precision = tp + fp > 0 ? tp / (tp + fp) : 0;
-  const recall = tp + fn > 0 ? tp / (tp + fn) : 0;
-  const f1Score = precision + recall > 0 ? (2 * precision * recall) / (precision + recall) : 0;
-  const mae = sumAbsErr / evaluationRows.length;
-  const rmse = Math.sqrt(sumSqErr / evaluationRows.length);
-
-  // Pearson Correlation (r) between predicted risk and actual cases
-  const meanPredicted = evaluationRows.reduce((a, b) => a + b.predictedRisk, 0) / evaluationRows.length;
-  const meanObserved = evaluationRows.reduce((a, b) => a + b.observedCases, 0) / evaluationRows.length;
-
-  let num = 0, denP = 0, denO = 0;
-  evaluationRows.forEach((r) => {
-    const dP = r.predictedRisk - meanPredicted;
-    const dO = r.observedCases - meanObserved;
-    num += dP * dO;
-    denP += dP * dP;
-    denO += dO * dO;
-  });
-
-  const pearsonCorrelation = denP > 0 && denO > 0 ? num / Math.sqrt(denP * denO) : 0;
+  const result: TemporalValidationResult = evaluateTemporalModel(
+    modelWeights,
+    'Expert-Weighted Baseline Model',
+    'Chronological prediction of period t dengue cases using period t-1 lagged features',
+    ['Lagged Cases (t-1)', 'Lagged Rainfall (t-1)', 'Population Density']
+  );
 
   return {
-    isValid: true,
-    totalRecordsEvaluated: evaluationRows.length,
-    metrics: {
-      precision: Math.round(precision * 100) / 100,
-      recall: Math.round(recall * 100) / 100,
-      f1Score: Math.round(f1Score * 100) / 100,
-      mae: Math.round(mae * 1000) / 1000,
-      rmse: Math.round(rmse * 1000) / 1000,
-      pearsonCorrelation: Math.round(pearsonCorrelation * 100) / 100,
-      truePositives: tp,
-      falsePositives: fp,
-      trueNegatives: tn,
-      falseNegatives: fn,
-    },
-    rows: evaluationRows,
+    isValid: result.isValid,
+    totalRecordsEvaluated: result.totalTestRecords,
+    metrics: result.metrics,
+    rows: result.testRows.map((r) => ({
+      areaId: r.areaId,
+      area: r.area,
+      year: r.targetYear,
+      month: r.targetMonth,
+      observedCases: r.targetCases_t0,
+      laggedCases: r.laggedCases_t1,
+      rainfallMm: r.laggedRainfall_t1,
+      density: r.populationDensity,
+      predictedRisk: r.predictedRisk,
+      observedHighRisk: r.targetHighRisk,
+      predictedHighRisk: r.predictedHighRisk,
+      hit: r.hit,
+    })),
+    sanityChecks: result.sanityChecks,
+    trainingPeriod: result.trainingPeriod,
+    testPeriod: result.testPeriod,
+    normalizationParamsTrain: result.normalizationParamsTrain,
   };
 }
 

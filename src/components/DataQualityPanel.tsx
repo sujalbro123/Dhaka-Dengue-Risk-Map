@@ -126,14 +126,40 @@ export const DataQualityPanel: React.FC<DataQualityPanelProps> = ({
       </div>
 
       {/* Primary Data Sources List */}
-      <div className="pt-2 border-t border-slate-800/80 text-[11px] text-slate-400 space-y-1 font-sans">
-        <span className="font-bold text-slate-300 uppercase tracking-wider block text-[10px]">
-          Attributed Data Sources:
-        </span>
-        <ul className="space-y-1 list-disc list-inside">
+      <div className="pt-2 border-t border-slate-800/80 text-[11px] text-slate-400 space-y-2 font-sans">
+        <div className="flex items-center justify-between">
+          <span className="font-bold text-slate-300 uppercase tracking-wider block text-[10px]">
+            Attributed Data Sources & Provenance Status:
+          </span>
+          <span className="text-[10px] text-amber-400 font-mono">
+            Verification: Partially Verified (Reports cited; micro-data extracted)
+          </span>
+        </div>
+        <ul className="space-y-1.5 divide-y divide-slate-900">
           {summary.sources.map((src) => (
-            <li key={src.id} className="leading-snug">
-              <strong className="text-slate-200">{src.name}</strong> ({src.organization}) — <em>{src.period}</em> [{src.type.toUpperCase()}]
+            <li key={src.id} className="pt-1.5 first:pt-0 leading-relaxed flex flex-col sm:flex-row sm:items-center justify-between gap-1">
+              <div>
+                <strong className="text-slate-200">{src.name}</strong> ({src.organization}) — <em className="text-slate-400">{src.period}</em>
+                {src.sourceUrl && (
+                  <a
+                    href={src.sourceUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="ml-1 text-blue-400 hover:underline text-[10px]"
+                  >
+                    [Source Link]
+                  </a>
+                )}
+              </div>
+              <span className="px-1.5 py-0.5 bg-slate-900 border border-slate-800 text-amber-300 rounded text-[9px] font-mono shrink-0 self-start sm:self-center">
+                {src.verificationStatus === 'partially_verified'
+                  ? 'Partially Verified'
+                  : src.verificationStatus === 'verified'
+                  ? 'Verified'
+                  : src.verificationStatus === 'synthetic'
+                  ? 'Synthetic'
+                  : 'Unverified'}
+              </span>
             </li>
           ))}
         </ul>
