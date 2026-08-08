@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { ComputedAreaRisk } from '../types';
-import { parseCSVData, exportRiskReportCSV } from '../utils/riskCalculator';
-import { FileSpreadsheet, Download, Upload, Check, AlertCircle, X, FileText } from 'lucide-react';
+import { validateAndParseCsv, exportRiskReportCSV, CsvValidationResult } from '../utils/riskCalculator';
+import { FileSpreadsheet, Download, Upload, Check, AlertCircle, X, FileText, AlertTriangle } from 'lucide-react';
 
 interface CsvDataModalProps {
   isOpen: boolean;
@@ -17,6 +17,7 @@ export const CsvDataModal: React.FC<CsvDataModalProps> = ({
   onImportCustomData,
 }) => {
   const [csvText, setCsvText] = useState('');
+  const [validationResult, setValidationResult] = useState<CsvValidationResult | null>(null);
   const [previewRows, setPreviewRows] = useState<Partial<ComputedAreaRisk>[]>([]);
   const [statusMsg, setStatusMsg] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
@@ -31,17 +32,26 @@ export const CsvDataModal: React.FC<CsvDataModalProps> = ({
       const content = event.target?.result as string;
       if (content) {
         setCsvText(content);
-        const parsed = parseCSVData(content);
-        setPreviewRows(parsed);
-        if (parsed.length > 0) {
+        const result = validateAndParseCsv(content);
+        setValidationResult(result);
+
+        if (result.isValid && result.recordsParsed > 0) {
+          const mappedRows: Partial<ComputedAreaRisk>[] = result.data.map((item) => ({
+            name: item.area || item.station || item.areaId || item.name,
+            recentCases30d: item.cases ?? item.recentCases30d ?? 0,
+            recentRainfallMm: item.rainfallMm ?? item.recentRainfallMm ?? 0,
+            populationDensity: item.populationDensity ?? 0,
+          }));
+          setPreviewRows(mappedRows);
           setStatusMsg({
             type: 'success',
-            text: `Parsed ${parsed.length} area records.`,
+            text: `Successfully validated & parsed ${result.recordsParsed} records (${result.type.toUpperCase()} Schema).`,
           });
         } else {
+          setPreviewRows([]);
           setStatusMsg({
             type: 'error',
-            text: 'Could not parse valid records. Check CSV headers.',
+            text: result.errors[0] || 'CSV validation failed. Please review errors below.',
           });
         }
       }
@@ -54,35 +64,63 @@ export const CsvDataModal: React.FC<CsvDataModalProps> = ({
     onImportCustomData(previewRows);
     setStatusMsg({
       type: 'success',
-      text: 'Loaded CSV data into the risk model.',
+      text: 'Loaded verified CSV data into the risk model.',
     });
     setTimeout(() => {
       onClose();
     }, 800);
   };
 
-  const downloadTemplateCSV = () => {
-    const sampleHeaders = 'area_name,month,case_count,rainfall_mm,population_density\n';
-    const sampleRows = [
-      'Mirpur,July,685,345,47717',
-      'Uttara,July,310,380,21886',
-      'Gulshan,July,220,360,17582',
-      'Dhanmondi,July,490,330,67441',
-      'Mohammadpur,July,780,350,73553',
-      'Old Dhaka,July,940,370,91216',
-      'Badda,July,540,390,43636',
-      'Motijheel,July,410,310,79166',
-      'Jatrabari,July,810,365,69696',
-      'Khilgaon,July,460,355,43262',
-      'Tejgaon,July,510,330,41836',
-      'Cantonment,July,110,320,21794',
-    ].join('\n');
+  const downloadSampleCsv = (schema: 'dengue' | 'rainfall' | 'population' | 'combined') => {
+    let headers = '';
+    let rows: string[] = [];
+    let fileName = '';
 
-    const blob = new Blob([sampleHeaders + sampleRows], { type: 'text/csv;charset=utf-8;' });
+    if (schema === 'dengue') {
+      headers = 'areaId,area,year,month,cases\n';
+      rows = [
+        'mirpur,Mirpur,2024,7,685',
+        'uttara,Uttara,2024,7,310',
+        'gulshan-banani,Gulshan & Banani,2024,7,195',
+        'dhanmondi,Dhanmondi,2024,7,540',
+        'mohammadpur,Mohammadpur,2024,7,610',
+        'old-dhaka,Old Dhaka,2024,7,790',
+      ];
+      fileName = 'DGHS_Dengue_Cases_Template.csv';
+    } else if (schema === 'rainfall') {
+      headers = 'stationId,station,year,month,rainfallMm\n';
+      rows = [
+        'dhaka_bmd,Dhaka BMD Central,2024,5,215',
+        'dhaka_bmd,Dhaka BMD Central,2024,6,340',
+        'dhaka_bmd,Dhaka BMD Central,2024,7,385',
+        'dhaka_bmd,Dhaka BMD Central,2024,8,310',
+      ];
+      fileName = 'BMD_Rainfall_Data_Template.csv';
+    } else if (schema === 'population') {
+      headers = 'areaId,area,year,population,areaSqKm\n';
+      rows = [
+        'mirpur,Mirpur,2024,1150000,24.1',
+        'uttara,Uttara,2024,580000,26.5',
+        'dhanmondi,Dhanmondi,2024,280000,4.3',
+        'old-dhaka,Old Dhaka,2024,620000,7.8',
+      ];
+      fileName = 'BBS_Population_Data_Template.csv';
+    } else {
+      headers = 'area_name,month,case_count,rainfall_mm,population_density\n';
+      rows = [
+        'Mirpur,July,685,345,47717',
+        'Uttara,July,310,380,21886',
+        'Gulshan,July,220,360,17582',
+        'Dhanmondi,July,490,330,67441',
+      ];
+      fileName = 'DGHS_Combined_Risk_Template.csv';
+    }
+
+    const blob = new Blob([headers + rows.join('\n')], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.setAttribute('href', url);
-    link.setAttribute('download', 'DGHS_Dhaka_Dengue_Data_Template.csv');
+    link.setAttribute('download', fileName);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -90,17 +128,17 @@ export const CsvDataModal: React.FC<CsvDataModalProps> = ({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 overflow-y-auto">
-      <div className="bg-slate-900 border border-[#E3E1DA]/20 rounded-sm max-w-2xl w-full p-5 sm:p-6 text-slate-100 my-8">
+      <div className="bg-slate-900 border border-[#E3E1DA]/20 rounded-sm max-w-3xl w-full p-5 sm:p-6 text-slate-100 my-8">
         {/* Modal Header */}
         <div className="flex items-center justify-between pb-4 border-b border-slate-800">
           <div className="flex items-center gap-2.5">
             <div className="p-1.5 bg-slate-800 text-slate-300 rounded-sm border border-slate-700">
-              <FileSpreadsheet className="w-4 h-4 text-slate-200" />
+              <FileSpreadsheet className="w-5 h-5 text-blue-400" />
             </div>
             <div>
-              <h2 className="text-lg font-bold text-white">Custom data import & CSV exporter</h2>
+              <h2 className="text-lg font-bold text-white">Research Data Import & Schema Validator</h2>
               <p className="text-xs text-slate-400">
-                Import DGHS case and rainfall CSV data or export calculated risk reports
+                Import verified Dengue, Rainfall, or Population CSVs with strict schema validation
               </p>
             </div>
           </div>
@@ -114,36 +152,58 @@ export const CsvDataModal: React.FC<CsvDataModalProps> = ({
         </div>
 
         <div className="space-y-5 mt-4 text-xs sm:text-sm">
-          {/* Format Specification Banner */}
-          <div className="bg-slate-950 p-3.5 rounded-sm border border-slate-800">
-            <div className="font-semibold text-slate-200 mb-1 flex items-center gap-1.5">
-              <FileText className="w-4 h-4 text-slate-400" />
-              Required CSV schema format:
+          {/* Supported Schema Specifications */}
+          <div className="bg-slate-950 p-3.5 rounded-sm border border-slate-800 space-y-2">
+            <div className="font-semibold text-slate-200 flex items-center gap-1.5">
+              <FileText className="w-4 h-4 text-blue-400" />
+              Supported Modular CSV Formats:
             </div>
-            <code className="block bg-slate-900 p-2 rounded-sm text-[11px] font-mono text-cyan-300 mt-1 overflow-x-auto">
-              area_name, month, case_count, rainfall_mm, population_density
-            </code>
-            <p className="text-slate-400 text-xs mt-2">
-              Columns can be in any order. Headers are auto-matched (e.g., <i>area</i>, <i>cases</i>, <i>rainfall</i>, <i>density</i>).
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 font-mono text-[11px]">
+              <div className="bg-slate-900 p-2 rounded-sm border border-slate-800">
+                <span className="text-emerald-400 font-bold block font-sans text-[10px]">1. Dengue CSV</span>
+                <code className="text-slate-300">areaId,area,year,month,cases</code>
+              </div>
+              <div className="bg-slate-900 p-2 rounded-sm border border-slate-800">
+                <span className="text-cyan-400 font-bold block font-sans text-[10px]">2. Rainfall CSV</span>
+                <code className="text-slate-300">stationId,station,year,month,rainfallMm</code>
+              </div>
+              <div className="bg-slate-900 p-2 rounded-sm border border-slate-800">
+                <span className="text-amber-400 font-bold block font-sans text-[10px]">3. Population CSV</span>
+                <code className="text-slate-300">areaId,area,year,population,areaSqKm</code>
+              </div>
+            </div>
+            <p className="text-slate-400 text-xs">
+              Automatic validation catches missing columns, non-numeric values, invalid months (1-12), and unknown area IDs.
             </p>
           </div>
 
-          {/* Action Buttons: Download Template vs Export Report */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          {/* Template Download Buttons */}
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="text-xs text-slate-400 font-semibold mr-1">Download Template:</span>
             <button
-              onClick={downloadTemplateCSV}
-              className="flex items-center justify-center gap-2 p-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 rounded-sm font-semibold text-xs transition-colors"
+              onClick={() => downloadSampleCsv('dengue')}
+              className="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-emerald-300 border border-slate-700 rounded-sm text-xs font-mono transition-colors"
             >
-              <Download className="w-4 h-4 text-emerald-400" />
-              <span>Download CSV template</span>
+              Dengue CSV
             </button>
-
+            <button
+              onClick={() => downloadSampleCsv('rainfall')}
+              className="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-cyan-300 border border-slate-700 rounded-sm text-xs font-mono transition-colors"
+            >
+              Rainfall CSV
+            </button>
+            <button
+              onClick={() => downloadSampleCsv('population')}
+              className="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-amber-300 border border-slate-700 rounded-sm text-xs font-mono transition-colors"
+            >
+              Population CSV
+            </button>
             <button
               onClick={() => exportRiskReportCSV(computedAreas)}
-              className="flex items-center justify-center gap-2 p-2.5 bg-[#1F3A5F] hover:bg-[#1a3050] text-white border border-[#E3E1DA]/30 rounded-sm font-semibold text-xs transition-colors"
+              className="ml-auto px-3 py-1 bg-[#1F3A5F] hover:bg-[#1a3050] text-white border border-[#E3E1DA]/30 rounded-sm text-xs font-bold transition-colors flex items-center gap-1.5"
             >
-              <FileSpreadsheet className="w-4 h-4 text-blue-300" />
-              <span>Export risk report CSV</span>
+              <Download className="w-3.5 h-3.5 text-blue-300" />
+              Export Calculated Risk CSV
             </button>
           </div>
 
@@ -160,17 +220,50 @@ export const CsvDataModal: React.FC<CsvDataModalProps> = ({
               htmlFor="csv-upload"
               className="cursor-pointer flex flex-col items-center justify-center gap-2 text-slate-300"
             >
-              <Upload className="w-6 h-6 text-slate-400" />
+              <Upload className="w-6 h-6 text-blue-400" />
               <span className="font-semibold text-xs sm:text-sm">
-                Click to browse or drop a .csv file here
+                Click to browse or drop a research .csv file here
               </span>
               <span className="text-[11px] text-slate-500">
-                Accepts comma-separated values (.csv)
+                Validates headers, numbers, and geographic area IDs automatically
               </span>
             </label>
           </div>
 
-          {/* Status Message */}
+          {/* Validation Feedback Messages */}
+          {validationResult && (
+            <div className="space-y-2">
+              {validationResult.errors.length > 0 && (
+                <div className="p-3 bg-red-950/60 border border-red-500/50 rounded-sm text-xs text-red-300 space-y-1 font-mono">
+                  <div className="flex items-center gap-1.5 font-bold text-red-400 font-sans">
+                    <AlertCircle className="w-4 h-4 shrink-0" />
+                    <span>Schema Validation Errors ({validationResult.errors.length}):</span>
+                  </div>
+                  <ul className="list-disc list-inside space-y-0.5 pl-1 max-h-24 overflow-y-auto">
+                    {validationResult.errors.map((err, idx) => (
+                      <li key={idx}>{err}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+              {validationResult.warnings.length > 0 && (
+                <div className="p-3 bg-amber-950/60 border border-amber-500/50 rounded-sm text-xs text-amber-300 space-y-1 font-mono">
+                  <div className="flex items-center gap-1.5 font-bold text-amber-400 font-sans">
+                    <AlertTriangle className="w-4 h-4 shrink-0" />
+                    <span>Data Quality Warnings ({validationResult.warnings.length}):</span>
+                  </div>
+                  <ul className="list-disc list-inside space-y-0.5 pl-1 max-h-24 overflow-y-auto">
+                    {validationResult.warnings.map((warn, idx) => (
+                      <li key={idx}>{warn}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* General Status Message */}
           {statusMsg && (
             <div
               className={`p-3 rounded-sm text-xs flex items-center gap-2 ${
@@ -191,15 +284,16 @@ export const CsvDataModal: React.FC<CsvDataModalProps> = ({
           {/* Parsed Preview Table */}
           {previewRows.length > 0 && (
             <div className="space-y-2">
-              <div className="font-semibold text-slate-300 text-xs">
-                Parsed data preview ({previewRows.length} areas):
+              <div className="font-semibold text-slate-300 text-xs flex items-center justify-between">
+                <span>Validated Data Preview ({previewRows.length} records):</span>
+                <span className="text-emerald-400 font-mono text-[11px]">Ready for Risk Model Integration</span>
               </div>
               <div className="max-h-40 overflow-y-auto border border-slate-800 rounded-sm">
                 <table className="w-full text-left text-xs bg-slate-950 font-mono">
                   <thead className="border-b border-slate-800 text-slate-400 sticky top-0 bg-slate-900 font-sans">
                     <tr>
-                      <th className="p-2">Area name</th>
-                      <th className="p-2">30-day cases</th>
+                      <th className="p-2">Entity Name</th>
+                      <th className="p-2">Cases</th>
                       <th className="p-2">Rainfall (mm)</th>
                       <th className="p-2">Density (/km²)</th>
                     </tr>
@@ -208,9 +302,9 @@ export const CsvDataModal: React.FC<CsvDataModalProps> = ({
                     {previewRows.map((row, i) => (
                       <tr key={i} className="text-slate-300">
                         <td className="p-2 font-bold text-white font-sans">{row.name}</td>
-                        <td className="p-2 text-blue-400 font-semibold">{row.recentCases30d}</td>
-                        <td className="p-2 text-cyan-400">{row.recentRainfallMm}</td>
-                        <td className="p-2">{row.populationDensity?.toLocaleString()}</td>
+                        <td className="p-2 text-blue-400 font-semibold">{row.recentCases30d ?? 'N/A'}</td>
+                        <td className="p-2 text-cyan-400">{row.recentRainfallMm ?? 'N/A'}</td>
+                        <td className="p-2">{row.populationDensity ? row.populationDensity.toLocaleString() : 'N/A'}</td>
                       </tr>
                     ))}
                   </tbody>
@@ -228,12 +322,12 @@ export const CsvDataModal: React.FC<CsvDataModalProps> = ({
           >
             Cancel
           </button>
-          {previewRows.length > 0 && (
+          {previewRows.length > 0 && validationResult?.isValid && (
             <button
               onClick={handleApplyCustomData}
               className="px-4 py-2 bg-[#1F3A5F] hover:bg-[#1a3050] text-white rounded-sm text-xs font-bold border border-[#E3E1DA]/30 transition-colors"
             >
-              Apply to risk map
+              Apply Validated Dataset to Risk Model
             </button>
           )}
         </div>
@@ -241,3 +335,4 @@ export const CsvDataModal: React.FC<CsvDataModalProps> = ({
     </div>
   );
 };
+

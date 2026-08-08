@@ -108,3 +108,118 @@ export interface PresetScenario {
   description: string;
   modifiers: SimulationModifiers;
 }
+
+// ==========================================
+// RESEARCH & HISTORICAL DATA LAYER TYPES
+// ==========================================
+
+export type DataMode = 'research' | 'demo';
+
+export interface HistoricalDengueRecord {
+  areaId: string;
+  area: string;
+  year: number;
+  month: number; // 1 - 12
+  date: string; // YYYY-MM-DD
+  cases: number;
+  source: string;
+}
+
+export interface HistoricalRainfallRecord {
+  stationId: string;
+  station: string;
+  year: number;
+  month: number; // 1 - 12
+  rainfallMm: number;
+  rainfallMm_lag1m?: number;
+  rainfallMm_lag2w?: number;
+  rainfallMm_lag3w?: number;
+  source: string;
+}
+
+export interface HistoricalPopulationRecord {
+  areaId: string;
+  area: string;
+  corporation: 'DNCC' | 'DSCC';
+  population: number;
+  areaSqKm: number;
+  populationDensity: number; // population / areaSqKm
+  year: number;
+  source: string;
+}
+
+export interface DataSourceMeta {
+  id: string;
+  name: string;
+  organization: string;
+  period: string;
+  geographicCoverage: string;
+  type: 'observed' | 'derived' | 'imported' | 'synthetic';
+  sourceUrl?: string;
+  lastUpdated: string;
+  notes: string;
+}
+
+export type DataQualityStatus = 'complete' | 'partially_complete' | 'missing' | 'interpolated';
+
+export interface AlignedAreaRecord {
+  areaId: string;
+  area: string;
+  corporation: 'DNCC' | 'DSCC';
+  year: number;
+  month: number;
+  dengueCases: number | null;
+  rainfallMm: number | null;
+  rainfallLag1m?: number | null;
+  rainfallLag2w?: number | null;
+  rainfallLag3w?: number | null;
+  population: number | null;
+  areaSqKm: number | null;
+  populationDensity: number | null;
+  dataQuality: DataQualityStatus;
+  missingFields: string[];
+  sources: {
+    dengue?: string;
+    rainfall?: string;
+    population?: string;
+  };
+}
+
+export interface DataQualitySummary {
+  totalRecords: number;
+  completeRecords: number;
+  partiallyCompleteRecords: number;
+  missingRecords: number;
+  coveragePeriod: string;
+  uniqueAreasCount: number;
+  rainfallStationsCount: number;
+  lastUpdated: string;
+  sources: DataSourceMeta[];
+}
+
+export type ModelArchitectureId = 'baseline' | 'cases_only' | 'cases_rain' | 'cases_rain_density';
+
+export interface ModelArchitectureConfig {
+  id: ModelArchitectureId;
+  name: string;
+  description: string;
+  variables: string[];
+  weights: ModelWeights;
+  rainfallLagSetting?: 'current' | 'lag1m' | 'lag2w' | 'lag3w';
+}
+
+export interface ValidationMetricResult {
+  modelId: ModelArchitectureId;
+  modelName: string;
+  variables: string;
+  precision: number | null;
+  recall: number | null;
+  f1Score: number | null;
+  mae: number | null;
+  rmse: number | null;
+  correlation: number | null;
+  sampleCount: number;
+  status: 'valid' | 'insufficient_data';
+  note?: string;
+}
+

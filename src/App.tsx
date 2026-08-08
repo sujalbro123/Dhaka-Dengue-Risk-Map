@@ -1,11 +1,13 @@
 import React, { useState, useMemo, useEffect } from 'react';
-import { DhakaArea, ModelWeights, SimulationModifiers, ComputedAreaRisk, SentAlertLog, CommunityReport } from './types';
+import { DhakaArea, ModelWeights, SimulationModifiers, ComputedAreaRisk, SentAlertLog, CommunityReport, DataMode } from './types';
 import { INITIAL_DHAKA_AREAS, PRESET_SCENARIOS, INITIAL_SENT_ALERTS, INITIAL_COMMUNITY_REPORTS } from './data/dhakaData';
+import { alignRealDatasets, mapAlignedRecordsToDhakaAreas } from './data/real/dataAlignment';
 import { calculateAreaRisks, DEFAULT_WEIGHTS, DEFAULT_MODIFIERS } from './utils/riskCalculator';
 import { MODEL_CONFIG } from './config/appConfig';
 
 import { Header } from './components/Header';
 import { SummaryStats } from './components/SummaryStats';
+import { DataQualityPanel } from './components/DataQualityPanel';
 import { DhakaMap } from './components/DhakaMap';
 import { AreaListView } from './components/AreaListView';
 import { AreaDetailPanel } from './components/AreaDetailPanel';
@@ -22,10 +24,36 @@ import { SectionErrorBoundary } from './components/SectionErrorBoundary';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState<'dashboard' | 'methodology' | 'validation'>('dashboard');
-  const [areasData, setAreasData] = useState<DhakaArea[]>(INITIAL_DHAKA_AREAS);
+  
+  // Data Mode State: 'research' (using DGHS, BMD & BBS) vs 'demo' (synthetic)
+  const [dataMode, setDataMode] = useState<DataMode>('research');
+
+  // Real Aligned Records derived dynamically from real datasets
+  const realAlignedRecords = useMemo(() => {
+    return alignRealDatasets();
+  }, []);
+
+  // Set initial areas data depending on mode
+  const initialResearchAreas = useMemo(() => {
+    return mapAlignedRecordsToDhakaAreas(realAlignedRecords, INITIAL_DHAKA_AREAS);
+  }, [realAlignedRecords]);
+
+  const [areasData, setAreasData] = useState<DhakaArea[]>(initialResearchAreas);
   const [selectedScenarioId, setSelectedScenarioId] = useState<string>('current-jul');
   const [weights, setWeights] = useState<ModelWeights>(DEFAULT_WEIGHTS);
   const [modifiers, setModifiers] = useState<SimulationModifiers>(DEFAULT_MODIFIERS);
+
+  // Toggle between Research Data and Demo Data
+  const handleToggleDataMode = (newMode: DataMode) => {
+    setIsLoading(true);
+    setDataMode(newMode);
+    if (newMode === 'research') {
+      setAreasData(initialResearchAreas);
+    } else {
+      setAreasData(INITIAL_DHAKA_AREAS);
+    }
+    setTimeout(() => setIsLoading(false), 200);
+  };
 
   // Loading state when preparing data or switching scenarios
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -184,6 +212,8 @@ export default function App() {
           onOpenSmsAlert={() => handleOpenSmsModal()}
           onOpenReportCase={() => handleOpenReportModal()}
           sentAlertsCount={sentAlerts.length}
+          dataMode={dataMode}
+          onToggleDataMode={handleToggleDataMode}
         />
       </SectionErrorBoundary>
 
@@ -199,6 +229,17 @@ export default function App() {
           </SectionErrorBoundary>
         ) : (
           <>
+            {/* Data Quality Panel (Visible when in Research Mode or on request) */}
+            <div className="mb-4">
+              <SectionErrorBoundary title="Data Quality Panel Error">
+                <DataQualityPanel
+                  alignedRecords={realAlignedRecords}
+                  dataMode={dataMode}
+                  onToggleDataMode={handleToggleDataMode}
+                />
+              </SectionErrorBoundary>
+            </div>
+
             {/* City Summary Stats KPI Bar */}
             <SectionErrorBoundary title="Summary Statistics Error">
               {isLoading ? <SummaryStatsSkeleton /> : <SummaryStats computedAreas={computedAreas} />}

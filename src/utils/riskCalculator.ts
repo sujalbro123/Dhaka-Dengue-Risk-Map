@@ -234,37 +234,176 @@ export function getRiskBadgeColor(level: RiskLevel) {
   }
 }
 
-export function parseCSVData(csvText: string): Partial<DhakaArea>[] {
-  const lines = csvText.trim().split('\n');
-  if (lines.length < 2) return [];
+export interface CsvValidationResult {
+  isValid: boolean;
+  type: 'dengue' | 'rainfall' | 'population' | 'combined' | 'unknown';
+  recordsParsed: number;
+  errors: string[];
+  warnings: string[];
+  data: any[];
+}
 
-  const header = lines[0].toLowerCase().split(',').map((h) => h.trim());
-  const nameIdx = header.findIndex((h) => h.includes('area') || h.includes('name'));
-  const casesIdx = header.findIndex((h) => h.includes('case'));
-  const rainIdx = header.findIndex((h) => h.includes('rain'));
-  const densityIdx = header.findIndex((h) => h.includes('density') || h.includes('pop'));
+export const KNOWN_AREA_IDS = [
+  'mirpur', 'uttara', 'gulshan-banani', 'dhanmondi', 'mohammadpur',
+  'old-dhaka', 'motijheel', 'tejgaon', 'badda', 'khilgaon',
+  'lalbagh', 'jatrabari', 'ramna', 'shahbagh', 'kamrangirchar',
+  'cantonment', 'kafrul', 'hazaribagh', 'demra', 'sabujbagh'
+];
 
-  const results: Partial<DhakaArea>[] = [];
-
-  for (let i = 1; i < lines.length; i++) {
-    const cols = lines[i].split(',').map((c) => c.trim());
-    if (cols.length < 2) continue;
-
-    const name = nameIdx !== -1 ? cols[nameIdx] : `Area ${i}`;
-    const cases = casesIdx !== -1 ? parseInt(cols[casesIdx], 10) || 0 : 0;
-    const rain = rainIdx !== -1 ? parseFloat(cols[rainIdx]) || 0 : 0;
-    const density = densityIdx !== -1 ? parseInt(cols[densityIdx], 10) || 0 : 0;
-
-    results.push({
-      name,
-      recentCases30d: cases,
-      recentRainfallMm: rain,
-      populationDensity: density,
-    });
+export function validateAndParseCsv(csvText: string): CsvValidationResult {
+  const lines = csvText.trim().split('\n').map((l) => l.trim()).filter((l) => l.length > 0);
+  if (lines.length < 2) {
+    return {
+      isValid: false,
+      type: 'unknown',
+      recordsParsed: 0,
+      errors: ['CSV file is empty or missing data rows.'],
+      warnings: [],
+      data: [],
+    };
   }
 
-  return results;
+  const headerCols = lines[0].toLowerCase().split(',').map((h) => h.trim().replace(/^"|"$/g, ''));
+  const errors: string[] = [];
+  const warnings: string[] = [];
+  const parsedData: any[] = [];
+  const seenKeys = new Set<string>();
+
+  // Detect Schema Type
+  let schemaType: 'dengue' | 'rainfall' | 'population' | 'combined' | 'unknown' = 'unknown';
+
+  if (headerCols.includes('areaid') && headerCols.includes('cases')) {
+    schemaType = 'dengue';
+  } else if (headerCols.includes('stationid') && headerCols.includes('rainfallmm')) {
+    schemaType = 'rainfall';
+  } else if (headerCols.includes('areaid') && headerCols.includes('areasqkm')) {
+    schemaType = 'population';
+  } else if (headerCols.some((h) => h.includes('area')) && (headerCols.some((h) => h.includes('case')) || headerCols.some((h) => h.includes('rain')))) {
+    schemaType = 'combined';
+  }
+
+  if (schemaType === 'unknown') {
+    errors.push('Unrecognized CSV format. Headers must match one of: (areaId,area,year,month,cases), (stationId,station,year,month,rainfallMm), (areaId,area,year,population,areaSqKm), or (area_name,month,case_count,rainfall_mm,population_density).');
+    return { isValid: false, type: 'unknown', recordsParsed: 0, errors, warnings, data: [] };
+  }
+
+  // Row by row validation
+  for (let i = 1; i < lines.length; i++) {
+    const rowNum = i + 1;
+    const cols = lines[i].split(',').map((c) => c.trim().replace(/^"|"$/g, ''));
+
+    if (cols.length < headerCols.length) {
+      warnings.push(`Row ${rowNum}: Fewer columns than expected headers.`);
+    }
+
+    if (schemaType === 'dengue') {
+      const areaIdIdx = headerCols.indexOf('areaid');
+      const areaIdx = headerCols.indexOf('area');
+      const yearIdx = headerCols.indexOf('year');
+      const monthIdx = headerCols.indexOf('month');
+      const casesIdx = headerCols.indexOf('cases');
+
+      const areaId = cols[areaIdIdx]?.toLowerCase() || '';
+      const area = cols[areaIdx] || areaId;
+      const year = parseInt(cols[yearIdx], 10);
+      const month = parseInt(cols[monthIdx], 10);
+      const cases = parseInt(cols[casesIdx], 10);
+
+      if (!areaId) errors.push(`Row ${rowNum}: Missing 'areaId'.`);
+      else if (!KNOWN_AREA_IDS.includes(areaId)) warnings.push(`Row ${rowNum}: Unknown areaId '${areaId}'.`);
+
+      if (isNaN(year) || year < 2000 || year > 2030) errors.push(`Row ${rowNum}: Invalid year value '${cols[yearIdx]}'.`);
+      if (isNaN(month) || month < 1 || month > 12) errors.push(`Row ${rowNum}: Invalid month value '${cols[monthIdx]}' (must be 1-12).`);
+      if (isNaN(cases) || cases < 0) errors.push(`Row ${rowNum}: Invalid non-numeric cases value '${cols[casesIdx]}'.`);
+
+      const dedupeKey = `${areaId}-${year}-${month}`;
+      if (seenKeys.has(dedupeKey)) {
+        warnings.push(`Row ${rowNum}: Duplicate record for area '${areaId}' period ${year}-${month}.`);
+      }
+      seenKeys.add(dedupeKey);
+
+      parsedData.push({ areaId, area, year, month, cases, source: 'User CSV Import' });
+    } else if (schemaType === 'rainfall') {
+      const stationIdIdx = headerCols.indexOf('stationid');
+      const stationIdx = headerCols.indexOf('station');
+      const yearIdx = headerCols.indexOf('year');
+      const monthIdx = headerCols.indexOf('month');
+      const rainIdx = headerCols.indexOf('rainfallmm');
+
+      const stationId = cols[stationIdIdx] || 'custom_station';
+      const station = cols[stationIdx] || stationId;
+      const year = parseInt(cols[yearIdx], 10);
+      const month = parseInt(cols[monthIdx], 10);
+      const rainfallMm = parseFloat(cols[rainIdx]);
+
+      if (isNaN(year) || year < 2000 || year > 2030) errors.push(`Row ${rowNum}: Invalid year '${cols[yearIdx]}'.`);
+      if (isNaN(month) || month < 1 || month > 12) errors.push(`Row ${rowNum}: Invalid month '${cols[monthIdx]}' (must be 1-12).`);
+      if (isNaN(rainfallMm) || rainfallMm < 0) errors.push(`Row ${rowNum}: Invalid rainfall value '${cols[rainIdx]}'.`);
+
+      parsedData.push({ stationId, station, year, month, rainfallMm, source: 'User CSV Import' });
+    } else if (schemaType === 'population') {
+      const areaIdIdx = headerCols.indexOf('areaid');
+      const areaIdx = headerCols.indexOf('area');
+      const yearIdx = headerCols.indexOf('year');
+      const popIdx = headerCols.indexOf('population');
+      const sqkmIdx = headerCols.indexOf('areasqkm');
+
+      const areaId = cols[areaIdIdx]?.toLowerCase() || '';
+      const area = cols[areaIdx] || areaId;
+      const year = parseInt(cols[yearIdx], 10) || 2024;
+      const population = parseInt(cols[popIdx], 10);
+      const areaSqKm = parseFloat(cols[sqkmIdx]);
+
+      if (!areaId) errors.push(`Row ${rowNum}: Missing 'areaId'.`);
+      if (isNaN(population) || population <= 0) errors.push(`Row ${rowNum}: Invalid population count '${cols[popIdx]}'.`);
+      if (isNaN(areaSqKm) || areaSqKm <= 0) errors.push(`Row ${rowNum}: Invalid areaSqKm value '${cols[sqkmIdx]}'.`);
+
+      const populationDensity = (!isNaN(population) && !isNaN(areaSqKm) && areaSqKm > 0)
+        ? Math.round(population / areaSqKm)
+        : 0;
+
+      parsedData.push({ areaId, area, year, population, areaSqKm, populationDensity, source: 'User CSV Import' });
+    } else if (schemaType === 'combined') {
+      const nameIdx = headerCols.findIndex((h) => h.includes('area') || h.includes('name'));
+      const casesIdx = headerCols.findIndex((h) => h.includes('case'));
+      const rainIdx = headerCols.findIndex((h) => h.includes('rain'));
+      const densityIdx = headerCols.findIndex((h) => h.includes('density') || h.includes('pop'));
+
+      const name = nameIdx !== -1 ? cols[nameIdx] : `Area ${i}`;
+      const cases = casesIdx !== -1 ? parseInt(cols[casesIdx], 10) || 0 : 0;
+      const rain = rainIdx !== -1 ? parseFloat(cols[rainIdx]) || 0 : 0;
+      const density = densityIdx !== -1 ? parseInt(cols[densityIdx], 10) || 0 : 0;
+
+      parsedData.push({
+        name,
+        recentCases30d: cases,
+        recentRainfallMm: rain,
+        populationDensity: density,
+      });
+    }
+  }
+
+  return {
+    isValid: errors.length === 0,
+    type: schemaType,
+    recordsParsed: parsedData.length,
+    errors,
+    warnings,
+    data: parsedData,
+  };
 }
+
+export function parseCSVData(csvText: string): Partial<DhakaArea>[] {
+  const result = validateAndParseCsv(csvText);
+  if (result.type === 'combined') return result.data;
+  return result.data.map((item) => ({
+    name: item.area || item.station || item.areaId,
+    recentCases30d: item.cases ?? item.recentCases30d ?? 0,
+    recentRainfallMm: item.rainfallMm ?? item.recentRainfallMm ?? 0,
+    populationDensity: item.populationDensity ?? 0,
+  }));
+}
+
 
 export function exportRiskReportCSV(computedAreas: ComputedAreaRisk[]) {
   const headers = [

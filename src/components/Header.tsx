@@ -10,9 +10,12 @@ import {
   Menu,
   X,
   FileCheck2,
+  Database,
+  FlaskConical,
 } from 'lucide-react';
 import { PRESET_SCENARIOS } from '../data/dhakaData';
 import { APP_METADATA } from '../config/appConfig';
+import { DataMode } from '../types';
 
 interface HeaderProps {
   activeTab: 'dashboard' | 'methodology' | 'validation';
@@ -25,6 +28,8 @@ interface HeaderProps {
   onOpenSmsAlert: () => void;
   onOpenReportCase: () => void;
   sentAlertsCount: number;
+  dataMode: DataMode;
+  onToggleDataMode: (mode: DataMode) => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -38,6 +43,8 @@ export const Header: React.FC<HeaderProps> = ({
   onOpenSmsAlert,
   onOpenReportCase,
   sentAlertsCount,
+  dataMode,
+  onToggleDataMode,
 }) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
@@ -56,9 +63,16 @@ export const Header: React.FC<HeaderProps> = ({
                 <h1 className="text-lg sm:text-2xl font-bold tracking-tight text-white flex items-center gap-2">
                   {APP_METADATA.name}
                 </h1>
-                <span className="text-slate-400 text-[10px] sm:text-xs font-semibold uppercase tracking-wider hidden sm:inline">
-                  {APP_METADATA.tagline}
-                </span>
+                {/* Mode Pill Badge */}
+                {dataMode === 'research' ? (
+                  <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-blue-950/90 text-blue-300 border border-blue-500/50 rounded text-[10px] font-mono font-bold tracking-wide">
+                    <Database className="w-3 h-3 text-blue-400" /> Research Data
+                  </span>
+                ) : (
+                  <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-amber-950/90 text-amber-300 border border-amber-500/50 rounded text-[10px] font-mono font-bold tracking-wide">
+                    <FlaskConical className="w-3 h-3 text-amber-400" /> Demo Mode
+                  </span>
+                )}
               </div>
               <p className="text-xs text-slate-400 hidden sm:block">
                 {APP_METADATA.subtitle}
@@ -66,14 +80,44 @@ export const Header: React.FC<HeaderProps> = ({
             </div>
           </div>
 
-          {/* Mobile Hamburger Toggle Button */}
-          <button
-            onClick={() => setIsMobileMenuOpen((prev) => !prev)}
-            aria-label="Toggle Navigation Menu"
-            className="lg:hidden p-2 rounded-sm bg-slate-800 border border-slate-700 text-slate-200 hover:text-white hover:bg-slate-700 transition-colors shrink-0"
-          >
-            {isMobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-          </button>
+          {/* Research vs Demo Mode Toggle Switch */}
+          <div className="flex items-center gap-2">
+            <div className="bg-slate-950 p-1 border border-slate-800 rounded-sm flex items-center">
+              <button
+                onClick={() => onToggleDataMode('research')}
+                className={`flex items-center gap-1 px-2.5 py-1 rounded-sm text-xs font-bold transition-all ${
+                  dataMode === 'research'
+                    ? 'bg-blue-700 text-white shadow-sm'
+                    : 'text-slate-400 hover:text-slate-200'
+                }`}
+                title="Use DGHS, BMD & BBS historical research data"
+              >
+                <Database className="w-3 h-3 text-blue-200" />
+                <span className="hidden xs:inline">Research</span>
+              </button>
+              <button
+                onClick={() => onToggleDataMode('demo')}
+                className={`flex items-center gap-1 px-2.5 py-1 rounded-sm text-xs font-bold transition-all ${
+                  dataMode === 'demo'
+                    ? 'bg-amber-600 text-white shadow-sm'
+                    : 'text-slate-400 hover:text-slate-200'
+                }`}
+                title="Use synthetic scenario dataset for stress-testing"
+              >
+                <FlaskConical className="w-3 h-3 text-amber-200" />
+                <span className="hidden xs:inline">Demo</span>
+              </button>
+            </div>
+
+            {/* Mobile Hamburger Toggle Button */}
+            <button
+              onClick={() => setIsMobileMenuOpen((prev) => !prev)}
+              aria-label="Toggle Navigation Menu"
+              className="lg:hidden p-2 rounded-sm bg-slate-800 border border-slate-700 text-slate-200 hover:text-white hover:bg-slate-700 transition-colors shrink-0"
+            >
+              {isMobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+            </button>
+          </div>
 
           {/* Desktop Navigation Tabs & Actions (Visible on lg screens and up) */}
           <div className="hidden lg:flex lg:items-center lg:gap-3">
