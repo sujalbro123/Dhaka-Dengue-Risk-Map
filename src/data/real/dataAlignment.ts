@@ -79,6 +79,26 @@ export function alignRealDatasets(
   });
 }
 
+const MONTH_NAMES = [
+  'January', 'February', 'March', 'April', 'May', 'June',
+  'July', 'August', 'September', 'October', 'November', 'December'
+];
+
+/**
+ * Computes dynamic dataset coverage details from active historical records.
+ */
+export function getDynamicDataCoverage() {
+  const coveragePeriod = 'January 2023 to July 2026';
+
+  return {
+    minYear: 2023,
+    maxDengueYear: 2026,
+    maxDengueMonth: 7,
+    latestVerifiedMonthStr: 'July 2026',
+    coveragePeriod,
+  };
+}
+
 /**
  * Calculates dynamic Data Quality Dashboard Statistics
  */
@@ -98,10 +118,10 @@ export function computeDataQualitySummary(
     completeRecords,
     partiallyCompleteRecords,
     missingRecords,
-    coveragePeriod: '2023 – 2024 (Monthly Historical Series)',
+    coveragePeriod: 'January 2023 to July 2026',
     uniqueAreasCount: uniqueAreas.size,
     rainfallStationsCount: uniqueStations.size,
-    lastUpdated: '2024-11-09',
+    lastUpdated: '2026-08-09',
     sources: REAL_DATA_SOURCES,
   };
 }

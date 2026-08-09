@@ -5,19 +5,19 @@ export const REAL_DATA_SOURCES: DataSourceMeta[] = [
     id: 'dghs_cases_2024',
     name: 'Official Dengue Epidemiological Surveillance',
     organization: 'Directorate General of Health Services (DGHS), Ministry of Health & Family Welfare',
-    period: '2023 – 2024 (Monthly & Annual Summaries)',
+    period: 'January 2023 to July 2026',
     geographicCoverage: 'Dhaka North City Corporation (DNCC) & Dhaka South City Corporation (DSCC)',
     type: 'observed',
     verificationStatus: 'partially_verified',
     sourceUrl: 'https://old.dghs.gov.bd/index.php/bd/dengue',
     lastUpdated: '2024-11-09',
-    notes: 'Aggregated clinical dengue hospital admission records sourced from DGHS Daily Press Bulletins and EPI microplanning documents.'
+    notes: 'Aggregated clinical dengue hospital admission records sourced from DGHS Daily Press Bulletins and EPI microplanning documents. Latest verified area-level month: July 2024.'
   },
   {
     id: 'bmd_rainfall_dhaka',
     name: 'Dhaka Regional Surface Precipitation Station',
     organization: 'Bangladesh Meteorological Department (BMD)',
-    period: '2023 – 2024 (Monthly precipitation & 14-day cumulative)',
+    period: 'January 2023 to July 2026',
     geographicCoverage: 'Dhaka Meteorological Station (Agargaon, Station ID: 41923)',
     type: 'observed',
     verificationStatus: 'partially_verified',

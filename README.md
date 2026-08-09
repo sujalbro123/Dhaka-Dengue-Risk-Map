@@ -21,8 +21,8 @@ The application uses a strict modular data layer separating real historical rese
 src/
 ├── data/
 │   ├── real/                       # Real Research Data Layer
-│   │   ├── dengueCases.ts          # DGHS Historical Dengue Records (2023–2024)
-│   │   ├── rainfall.ts             # BMD Meteorological Rainfall Records with Lag Fields
+│   │   ├── dengueCases.ts          # DGHS Historical Dengue Records (Jan 2023 – July 2024; Latest Verified Month: July 2024)
+│   │   ├── rainfall.ts             # BMD Meteorological Rainfall Records (Jan 2023 – Dec 2024) with Lag Fields
 │   │   ├── population.ts           # BBS Demographic & Census Statistics (2024)
 │   │   ├── dataSources.ts          # Transparent Metadata & Data Lineage Attributes
 │   │   ├── dataAlignment.ts        # Relational Data Alignment & Validation Engine
@@ -60,7 +60,7 @@ $$C_{\text{norm}} = \frac{C - C_{\min}}{C_{\max} - C_{\min}}, \quad R_{\text{nor
 Performance metrics are generated dynamically from the chronological held-out evaluation pipeline. Because the currently available verified historical area-month dataset is limited, results should be interpreted as a pilot evaluation rather than definitive epidemiological validation.
 
 ### Evaluation Methodology
-* **Chronological Out-of-Sample Split**: Training on earlier historical periods (2023) and evaluating on held-out future periods (2024).
+* **Chronological Out-of-Sample Split**: Training on earlier historical periods (2023) and evaluating on held-out future periods (2024, up to July 2024).
 * **Target Definition**: Observed Dengue Cases at Period $t$ ($C_t$).
 * **Lagged Features**: Features from Period $t-1$ ($C_{t-1}, R_{t-1}$) and census population density ($D$). Period $t$ dengue cases are strictly excluded from inputs to eliminate target leakage.
 * **Train-Only Normalization**: Normalization min-max bounds are fitted strictly on the training set.
@@ -74,7 +74,7 @@ Performance metrics are generated dynamically from the chronological held-out ev
 All three models are evaluated dynamically on the exact same held-out test observations in the application's **Validation** view.
 
 ## Research Limitations
-1. **Limited Historical Observations**: The currently available verified area-month records restrict the sample size of the test evaluation. Results represent a pilot evaluation pending broader multi-year surveillance digitization.
+1. **Limited Historical Observations**: The currently available verified area-month records cover up to July 2024, restricting the sample size of the test evaluation. Results represent a pilot evaluation pending broader multi-year surveillance digitization.
 2. **Rainfall Proxy Mapping**: Precipitation is recorded at the Agargaon BMD central station and mapped to study thanas as a regional proxy. Sub-thana microclimatic rain variation is not independently gauged.
 3. **Partial Source Verification**: Dengue case data reflects aggregated public DGHS bulletins and microplanning summaries (Partially verified).
 4. **Unobserved Entomological Vector Indices**: Official surveillance currently lacks real-time House Index (HI), Container Index (CI), and Breteau Index (BI) larval survey data per thana.

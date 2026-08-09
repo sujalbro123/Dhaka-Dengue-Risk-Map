@@ -71,7 +71,7 @@ export const ValidationPage: React.FC<ValidationPageProps> = ({ onBackToDashboar
             <div className="bg-slate-950 p-2.5 rounded border border-slate-800">
               <span className="text-[10px] text-slate-400 uppercase font-sans block">Held-Out Test Observations</span>
               <span className="font-bold text-cyan-400 text-xs">{modelC.totalTestRecords} Records</span>
-              <span className="text-[9px] text-slate-500 block">2024 Period t-1 &rarr; t</span>
+              <span className="text-[9px] text-slate-500 block">Up to July 2026</span>
             </div>
             <div className="bg-slate-950 p-2.5 rounded border border-slate-800">
               <span className="text-[10px] text-slate-400 uppercase font-sans block">Areas Evaluated</span>

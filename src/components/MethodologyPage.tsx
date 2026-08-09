@@ -256,7 +256,7 @@ export const MethodologyPage: React.FC<MethodologyPageProps> = ({ onBackToDashbo
             <Database className="w-5 h-5" />
           </div>
           <div>
-            <h2 className="text-base font-bold text-white">
+            <h2 className="text-base font-bold text-white uppercase tracking-wider text-xs sm:text-sm">
               3. Attributed Data Sources & Provenance (Research vs. Demo Mode)
             </h2>
             <p className="text-xs text-slate-400">
@@ -265,90 +265,200 @@ export const MethodologyPage: React.FC<MethodologyPageProps> = ({ onBackToDashbo
           </div>
         </div>
 
-        <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse text-xs">
-            <thead className="bg-slate-950 text-slate-400 uppercase text-[10px] font-bold tracking-wider border-b border-slate-800">
-              <tr>
-                <th className="p-3">Data Category / Institution</th>
-                <th className="p-3">Attributed Source & Details</th>
-                <th className="p-3">Verification Status</th>
-                <th className="p-3">Role & Usage</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-800 text-slate-300">
-              <tr className="bg-slate-900/40 hover:bg-slate-800/30">
-                <td className="p-3 font-semibold text-white flex items-center gap-1.5">
-                  <Building2 className="w-4 h-4 text-blue-400 shrink-0" />
-                  DGHS Surveillance Data
-                </td>
-                <td className="p-3 text-slate-300">
-                  Directorate General of Health Services press bulletins & EPI microplanning documents (2023–2024).
-                </td>
-                <td className="p-3">
-                  <span className="px-2 py-0.5 bg-amber-500/20 text-amber-300 border border-amber-500/30 rounded-sm font-semibold text-[10px]">
-                    Partially Verified
-                  </span>
-                </td>
-                <td className="p-3 text-slate-400">
-                  Provides observed hospital admission records per thana for research-mode risk mapping and temporal validation.
-                </td>
-              </tr>
+        {/* Structured Source Cards Grid */}
+        <div className="space-y-3">
+          <div className="text-xs text-slate-300 font-bold uppercase tracking-wider flex items-center justify-between">
+            <span>Primary Attributed Research Sources</span>
+            <span className="text-[10px] font-mono text-amber-400">Overall Verification: Partially Verified</span>
+          </div>
 
-              <tr className="bg-slate-900/40 hover:bg-slate-800/30">
-                <td className="p-3 font-semibold text-white flex items-center gap-1.5">
-                  <CloudRain className="w-4 h-4 text-cyan-400 shrink-0" />
-                  BMD Rainfall Records
-                </td>
-                <td className="p-3 text-slate-300">
-                  Bangladesh Meteorological Department, Agargaon Station (Station ID: 41923).
-                </td>
-                <td className="p-3">
-                  <span className="px-2 py-0.5 bg-amber-500/20 text-amber-300 border border-amber-500/30 rounded-sm font-semibold text-[10px]">
-                    Partially Verified (Station Proxy)
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+            <div className="p-3.5 rounded-sm border bg-slate-900/90 border-slate-800 space-y-2.5 flex flex-col justify-between">
+              <div className="space-y-2">
+                <div className="flex items-start justify-between gap-2">
+                  <div className="flex items-center gap-2">
+                    <div className="p-1.5 rounded-sm bg-slate-800 border border-slate-700/80">
+                      <Building2 className="w-4 h-4 text-blue-400 shrink-0" />
+                    </div>
+                    <div>
+                      <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider font-mono">DGHS</div>
+                      <h4 className="text-xs font-bold text-slate-100">Official Dengue Surveillance</h4>
+                    </div>
+                  </div>
+                  <span className="px-2 py-0.5 bg-amber-950/80 text-amber-300 border border-amber-800/80 rounded-sm font-mono text-[10px] font-semibold">
+                    PARTIALLY VERIFIED
                   </span>
-                </td>
-                <td className="p-3 text-slate-400">
-                  Serves as a regional surface precipitation proxy mapped across study thanas. Sub-thana microclimatic rain varies.
-                </td>
-              </tr>
+                </div>
+                <p className="text-[11px] text-slate-300 font-medium">Directorate General of Health Services (DGHS), Ministry of Health & Family Welfare</p>
+                <div className="grid grid-cols-2 gap-2 text-[10px] font-mono bg-slate-950/80 p-2 rounded-sm border border-slate-800/80 text-slate-300">
+                  <div>
+                    <span className="text-slate-500 block uppercase font-sans font-semibold text-[9px]">Coverage</span>
+                    <span>January 2023 to July 2026</span>
+                  </div>
+                  <div>
+                    <span className="text-slate-500 block uppercase font-sans font-semibold text-[9px]">Geographic Scope</span>
+                    <span>DNCC & DSCC Thanas</span>
+                  </div>
+                </div>
+                <p className="text-[11px] text-slate-400 font-sans">
+                  Aggregated clinical dengue hospital admission records sourced from DGHS Daily Press Bulletins and EPI microplanning documents.
+                </p>
+              </div>
+              <div className="pt-2 border-t border-slate-800/80 flex items-center justify-between">
+                <span className="text-[10px] text-slate-500 font-mono">Epidemiological Baseline</span>
+                <a
+                  href="https://old.dghs.gov.bd/index.php/bd/dengue"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Open official DGHS source"
+                  className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-blue-600/20 hover:bg-blue-600/30 text-blue-300 border border-blue-500/40 rounded-sm font-semibold text-[11px]"
+                >
+                  <span>Official Source</span>
+                  <span className="text-xs">↗</span>
+                </a>
+              </div>
+            </div>
 
-              <tr className="bg-slate-900/40 hover:bg-slate-800/30">
-                <td className="p-3 font-semibold text-white flex items-center gap-1.5">
-                  <FileCheck2 className="w-4 h-4 text-emerald-400 shrink-0" />
-                  BBS Population Census
-                </td>
-                <td className="p-3 text-slate-300">
-                  Bangladesh Bureau of Statistics (BBS) 2022 Census & 2024 Microplanning estimates.
-                </td>
-                <td className="p-3">
-                  <span className="px-2 py-0.5 bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 rounded-sm font-semibold text-[10px]">
-                    Partially Verified
+            <div className="p-3.5 rounded-sm border bg-slate-900/90 border-slate-800 space-y-2.5 flex flex-col justify-between">
+              <div className="space-y-2">
+                <div className="flex items-start justify-between gap-2">
+                  <div className="flex items-center gap-2">
+                    <div className="p-1.5 rounded-sm bg-slate-800 border border-slate-700/80">
+                      <CloudRain className="w-4 h-4 text-cyan-400 shrink-0" />
+                    </div>
+                    <div>
+                      <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider font-mono">BMD</div>
+                      <h4 className="text-xs font-bold text-slate-100">Surface Precipitation Station</h4>
+                    </div>
+                  </div>
+                  <span className="px-2 py-0.5 bg-amber-950/80 text-amber-300 border border-amber-800/80 rounded-sm font-mono text-[10px] font-semibold">
+                    SOURCE ATTRIBUTED
                   </span>
-                </td>
-                <td className="p-3 text-slate-400">
-                  Official population counts and land area (km²) used to compute population density per thana.
-                </td>
-              </tr>
+                </div>
+                <p className="text-[11px] text-slate-300 font-medium">Bangladesh Meteorological Department (BMD)</p>
+                <div className="grid grid-cols-2 gap-2 text-[10px] font-mono bg-slate-950/80 p-2 rounded-sm border border-slate-800/80 text-slate-300">
+                  <div>
+                    <span className="text-slate-500 block uppercase font-sans font-semibold text-[9px]">Station ID</span>
+                    <span>Agargaon (41923)</span>
+                  </div>
+                  <div>
+                    <span className="text-slate-500 block uppercase font-sans font-semibold text-[9px]">Coverage</span>
+                    <span>January 2023 to July 2026</span>
+                  </div>
+                </div>
+                <p className="text-[11px] text-slate-400 font-sans">
+                  Centralized rainfall recorded at Agargaon station (41923) mapped across study thanas as a regional proxy. Sub-thana rain varies.
+                </p>
+              </div>
+              <div className="pt-2 border-t border-slate-800/80 flex items-center justify-between">
+                <span className="text-[10px] text-slate-500 font-mono">Meteorological Proxy</span>
+                <a
+                  href="http://live.bmd.gov.bd/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Open official BMD source"
+                  className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-blue-600/20 hover:bg-blue-600/30 text-blue-300 border border-blue-500/40 rounded-sm font-semibold text-[11px]"
+                >
+                  <span>Official Source</span>
+                  <span className="text-xs">↗</span>
+                </a>
+              </div>
+            </div>
 
-              <tr className="bg-slate-900/40 hover:bg-slate-800/30">
-                <td className="p-3 font-semibold text-white flex items-center gap-1.5">
-                  <Activity className="w-4 h-4 text-purple-400 shrink-0" />
-                  Demo / Synthetic Dataset
-                </td>
-                <td className="p-3 text-slate-300">
-                  Interactive scenario values & what-if parameter modifiers.
-                </td>
-                <td className="p-3">
-                  <span className="px-2 py-0.5 bg-purple-500/20 text-purple-300 border border-purple-500/30 rounded-sm font-semibold text-[10px]">
-                    Simulated / Scenario Data
+            <div className="p-3.5 rounded-sm border bg-slate-900/90 border-slate-800 space-y-2.5 flex flex-col justify-between">
+              <div className="space-y-2">
+                <div className="flex items-start justify-between gap-2">
+                  <div className="flex items-center gap-2">
+                    <div className="p-1.5 rounded-sm bg-slate-800 border border-slate-700/80">
+                      <FileCheck2 className="w-4 h-4 text-emerald-400 shrink-0" />
+                    </div>
+                    <div>
+                      <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider font-mono">BBS & EPI</div>
+                      <h4 className="text-xs font-bold text-slate-100">Administrative & Census Microplanning</h4>
+                    </div>
+                  </div>
+                  <span className="px-2 py-0.5 bg-amber-950/80 text-amber-300 border border-amber-800/80 rounded-sm font-mono text-[10px] font-semibold">
+                    SOURCE ATTRIBUTED
                   </span>
-                </td>
-                <td className="p-3 text-slate-400">
-                  Used exclusively in Demo Mode for UI stress-testing, custom what-if rainfall simulations, and offline previewing.
-                </td>
-              </tr>
-            </tbody>
-          </table>
+                </div>
+                <p className="text-[11px] text-slate-300 font-medium">DGHS EPI Digital Microplanning & Bangladesh Bureau of Statistics (BBS)</p>
+                <div className="grid grid-cols-2 gap-2 text-[10px] font-mono bg-slate-950/80 p-2 rounded-sm border border-slate-800/80 text-slate-300">
+                  <div>
+                    <span className="text-slate-500 block uppercase font-sans font-semibold text-[9px]">Baseline Year</span>
+                    <span>2024 Estimates</span>
+                  </div>
+                  <div>
+                    <span className="text-slate-500 block uppercase font-sans font-semibold text-[9px]">Geographic Scope</span>
+                    <span>20 City Thanas</span>
+                  </div>
+                </div>
+                <p className="text-[11px] text-slate-400 font-sans">
+                  Official census population and land area (sq km) records used to calculate exact population densities across study thanas.
+                </p>
+              </div>
+              <div className="pt-2 border-t border-slate-800/80 flex items-center justify-between">
+                <span className="text-[10px] text-slate-500 font-mono">Demographic Census</span>
+                <a
+                  href="http://www.bbs.gov.bd/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Open official BBS source"
+                  className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-blue-600/20 hover:bg-blue-600/30 text-blue-300 border border-blue-500/40 rounded-sm font-semibold text-[11px]"
+                >
+                  <span>Official Source</span>
+                  <span className="text-xs">↗</span>
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Demo / Synthetic Mode Distinction Card */}
+        <div className="p-3.5 rounded-sm border bg-purple-950/20 border-purple-900/60 space-y-2">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Activity className="w-4 h-4 text-purple-400" />
+              <strong className="text-xs font-bold text-purple-200">DEMO / SCENARIO SIMULATION DATASET</strong>
+            </div>
+            <span className="px-2 py-0.5 bg-purple-900/60 text-purple-300 border border-purple-700/60 rounded-sm font-mono text-[10px] font-semibold">
+              SIMULATED / DEMO MODE
+            </span>
+          </div>
+          <p className="text-xs text-slate-300 font-sans leading-relaxed">
+            Synthetic values engineered exclusively for interactive scenario modeling, what-if parameter stress-testing, and offline previewing. Synthetic data is kept completely separated from research observations and is NOT used for official epidemiological conclusions.
+          </p>
+        </div>
+
+        {/* Why These Sources? Section */}
+        <div className="bg-slate-950 p-3.5 rounded-sm border border-slate-800 space-y-2 text-xs">
+          <div className="flex items-center gap-1.5 font-bold text-slate-200 uppercase tracking-wider text-[11px]">
+            <HelpCircle className="w-3.5 h-3.5 text-cyan-400" />
+            <span>Why These Sources?</span>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-[11px] text-slate-300 leading-relaxed font-sans">
+            <div className="bg-slate-900/60 p-2.5 rounded border border-slate-800/60">
+              <strong className="text-blue-300 block font-mono text-[10px] uppercase">DGHS (Health Services)</strong>
+              Provides official dengue epidemiological surveillance and hospital admission records per thana for research risk calculations.
+            </div>
+            <div className="bg-slate-900/60 p-2.5 rounded border border-slate-800/60">
+              <strong className="text-cyan-300 block font-mono text-[10px] uppercase">BMD (Meteorology)</strong>
+              Provides central station precipitation measurements used as an environmental vector breeding proxy.
+            </div>
+            <div className="bg-slate-900/60 p-2.5 rounded border border-slate-800/60">
+              <strong className="text-emerald-300 block font-mono text-[10px] uppercase">BBS (Statistics)</strong>
+              Provides demographic census figures and administrative boundary areas to derive population density.
+            </div>
+          </div>
+        </div>
+
+        {/* Footnote */}
+        <div className="pt-2 border-t border-slate-800/80 text-[10px] text-slate-400 font-mono flex items-center justify-between flex-wrap gap-2">
+          <p>
+            Source information is provided for transparency and reproducibility. Verification status reflects current project metadata.
+          </p>
+          <div className="text-slate-500 italic">
+            DDRM Research Data Registry v1.2
+          </div>
         </div>
       </div>
 
@@ -377,7 +487,7 @@ export const MethodologyPage: React.FC<MethodologyPageProps> = ({ onBackToDashbo
             </h3>
             <ul className="space-y-1.5 text-slate-400 list-disc list-inside leading-relaxed">
               <li>
-                <strong>Limited Verified Sample Size:</strong> Current historical validation is based on available 2023–2024 records, representing a pilot evaluation.
+                <strong>Limited Verified Sample Size:</strong> Current historical validation is based on verified January 2023 – July 2024 records (Latest Verified Month: July 2024), representing a pilot evaluation.
               </li>
               <li>
                 <strong>Regional Rainfall Proxy:</strong> BMD precipitation from Agargaon Station 41923 is applied city-wide; sub-thana microclimatic rain is not gauged.

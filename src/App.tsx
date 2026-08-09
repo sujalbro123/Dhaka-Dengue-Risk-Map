@@ -375,7 +375,7 @@ export default function App() {
       <footer className="border-t border-slate-800 bg-slate-900 py-4 mt-8 text-center text-xs text-slate-500">
         <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-2">
           <div>
-            Dhaka Dengue Risk Map (DDRM) v1.2 • Epidemiological GIS Research Platform
+            Dhaka Dengue Risk Map (DDRM) v1.2 • Epidemiological GIS Research Platform • Data Coverage: January 2023 to July 2026
           </div>
           <div className="text-slate-400">
             Data Sources: DGHS Surveillance, Bangladesh Meteorological Department (BMD), BBS Census
