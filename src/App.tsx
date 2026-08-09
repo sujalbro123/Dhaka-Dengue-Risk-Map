@@ -302,12 +302,12 @@ export default function App() {
                         onToggleCompareMode={() => setIsCompareMode((prev) => !prev)}
                       />
                     ) : (
-                      <div className="bg-[#0f1218] border border-slate-800 rounded-2xl p-4 shadow-xl flex-1 flex flex-col">
+                      <div className="bg-slate-900 border border-slate-800 rounded-sm p-4 shadow-sm flex-1 flex flex-col">
                         <div className="flex items-center justify-between pb-3 border-b border-slate-800">
                           <h2 className="text-base font-bold text-white">
                             Dhaka thana outbreak directory
                           </h2>
-                          <div className="flex items-center bg-[#1a1f26] p-1 rounded-xl border border-slate-700">
+                          <div className="flex items-center bg-slate-800 p-1 rounded-sm border border-slate-700">
                             <button
                               onClick={() => setViewMode('map')}
                               className="px-3 py-1 text-xs font-medium text-slate-300 hover:text-white"
@@ -316,7 +316,7 @@ export default function App() {
                             </button>
                             <button
                               onClick={() => setViewMode('grid')}
-                              className={`px-3 py-1 text-xs font-bold rounded-lg ${
+                              className={`px-3 py-1 text-xs font-bold rounded-sm ${
                                 viewMode === 'grid' ? 'bg-emerald-500 text-slate-950' : 'text-slate-300'
                               }`}
                             >
@@ -324,7 +324,7 @@ export default function App() {
                             </button>
                             <button
                               onClick={() => setViewMode('table')}
-                              className={`px-3 py-1 text-xs font-bold rounded-lg ${
+                              className={`px-3 py-1 text-xs font-bold rounded-sm ${
                                 viewMode === 'table' ? 'bg-emerald-500 text-slate-950' : 'text-slate-300'
                               }`}
                             >
@@ -372,13 +372,13 @@ export default function App() {
       />
 
       {/* Footer / Academic Citation */}
-      <footer className="border-t border-slate-800/80 bg-[#0f1218]/80 py-4 mt-8 text-center text-xs text-slate-500">
+      <footer className="border-t border-slate-800 bg-slate-900 py-4 mt-8 text-center text-xs text-slate-500">
         <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-2">
           <div>
-            Dhaka dengue early warning model v1.2 • Research prototype
+            Dhaka Dengue Risk Map (DDRM) v1.2 • Epidemiological GIS Research Platform
           </div>
           <div className="text-slate-400">
-            Data sources: DGHS surveillance, Bangladesh Meteorological Department (BMD), BBS census
+            Data Sources: DGHS Surveillance, Bangladesh Meteorological Department (BMD), BBS Census
           </div>
         </div>
       </footer>

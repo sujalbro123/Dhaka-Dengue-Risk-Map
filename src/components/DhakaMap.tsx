@@ -43,36 +43,36 @@ export const DhakaMap: React.FC<DhakaMapProps> = React.memo(({
   };
 
   return (
-    <div className="bg-slate-900 border border-slate-800 rounded-2xl p-3 sm:p-4 shadow-xl flex flex-col h-full min-h-[400px] sm:min-h-[520px]">
+    <div className="bg-slate-900 border border-slate-800 rounded-sm p-3 sm:p-4 shadow-sm flex flex-col h-full min-h-[400px] sm:min-h-[520px]">
       {/* Map Header Controls */}
       <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-slate-800">
         <div>
           <h2 className="text-base sm:text-lg font-bold text-white flex items-center gap-2">
             <MapIcon className="w-5 h-5 text-emerald-400" />
-            Interactive Dhaka thana risk map
+            Interactive Dhaka Thana Risk Map
           </h2>
           <p className="text-xs text-slate-400">
-            Click any zone to inspect epidemiology & risk breakdown
+            Click any zone to inspect epidemiological metrics and risk breakdown
           </p>
         </div>
 
         {/* Mode Switcher Buttons */}
-        <div className="flex items-center bg-slate-800 p-1 rounded-xl border border-slate-700/80 overflow-x-auto max-w-full">
+        <div className="flex items-center bg-slate-800 p-1 rounded-sm border border-slate-700/80 overflow-x-auto max-w-full">
           <button
             onClick={() => onChangeViewMode('map')}
-            className={`flex items-center gap-1.5 px-2.5 sm:px-3 py-1 rounded-lg text-xs font-semibold transition-all shrink-0 ${
+            className={`flex items-center gap-1.5 px-2.5 sm:px-3 py-1 rounded-sm text-xs font-semibold transition-all shrink-0 ${
               viewMode === 'map'
                 ? 'bg-emerald-500 text-slate-950 shadow-sm'
                 : 'text-slate-300 hover:text-white hover:bg-slate-700/50'
             }`}
           >
             <MapIcon className="w-3.5 h-3.5" />
-            <span>SVG Map</span>
+            <span>GIS Map</span>
           </button>
 
           <button
             onClick={() => onChangeViewMode('grid')}
-            className={`flex items-center gap-1.5 px-2.5 sm:px-3 py-1 rounded-lg text-xs font-semibold transition-all shrink-0 ${
+            className={`flex items-center gap-1.5 px-2.5 sm:px-3 py-1 rounded-sm text-xs font-semibold transition-all shrink-0 ${
               viewMode === 'grid'
                 ? 'bg-emerald-500 text-slate-950 shadow-sm'
                 : 'text-slate-300 hover:text-white hover:bg-slate-700/50'
@@ -84,7 +84,7 @@ export const DhakaMap: React.FC<DhakaMapProps> = React.memo(({
 
           <button
             onClick={() => onChangeViewMode('table')}
-            className={`flex items-center gap-1.5 px-2.5 sm:px-3 py-1 rounded-lg text-xs font-semibold transition-all shrink-0 ${
+            className={`flex items-center gap-1.5 px-2.5 sm:px-3 py-1 rounded-sm text-xs font-semibold transition-all shrink-0 ${
               viewMode === 'table'
                 ? 'bg-emerald-500 text-slate-950 shadow-sm'
                 : 'text-slate-300 hover:text-white hover:bg-slate-700/50'
